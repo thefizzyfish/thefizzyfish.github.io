@@ -1,0 +1,4 @@
+baseURL = 'https://thefizzyfish.github.io/'
+languageCode = 'en-us'
+title = 'TheFizzyFish-blog'
+theme = 'hello-friend-ng'

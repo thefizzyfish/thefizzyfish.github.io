@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on TheFizzyFish-blog</title>
+    <link>http://localhost:1313/tags/linux/</link>
+    <description>Recent content in Linux on TheFizzyFish-blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 24 Aug 2024 16:50:47 -0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Boardlight</title>
+      <link>http://localhost:1313/posts/boardlight/</link>
+      <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+      <guid>http://localhost:1313/posts/boardlight/</guid>
+      <description>HTB - Linux - Easy</description>
+    </item>
+    <item>
+      <title>Busqueda</title>
+      <link>http://localhost:1313/posts/busqueda/</link>
+      <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+      <guid>http://localhost:1313/posts/busqueda/</guid>
+      <description>HTB - Linux - Easy</description>
+    </item>
+    <item>
+      <title>Editorial</title>
+      <link>http://localhost:1313/posts/editorial/</link>
+      <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+      <guid>http://localhost:1313/posts/editorial/</guid>
+      <description>HTB - Linux - Easy</description>
+    </item>
+    <item>
+      <title>Greenhorn</title>
+      <link>http://localhost:1313/posts/greenhorn/</link>
+      <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+      <guid>http://localhost:1313/posts/greenhorn/</guid>
+      <description>HTB - Linux - Easy</description>
+    </item>
+    <item>
+      <title>Permx</title>
+      <link>http://localhost:1313/posts/permx/</link>
+      <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
+      <guid>http://localhost:1313/posts/permx/</guid>
+      <description>HTB - Linux - Easy</description>
+    </item>
+  </channel>
+</rss>
