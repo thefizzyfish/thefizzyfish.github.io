@@ -34,7 +34,7 @@ disable404     = false
 disableHugoGeneratorInject = false
 
 [permalinks]
-  posts = "/posts/:year/:month/:title/"
+  posts = "/walkthroughs/:year/:month/:title/"
 
 [blackfriday]
   hrefTargetBlank = true
@@ -86,13 +86,13 @@ disableHugoGeneratorInject = false
   # generate the buttons here: https://sharingbuttons.io
   # and add them into your own `layouts/partials/sharing-buttons.html`
   #
-  enableSharingButtons = true
+  # enableSharingButtons = true
 
   # Global language menu
   #
   # Enables the global language menu.
   #
-  #enableGlobalLanguageMenu = true
+  # enableGlobalLanguageMenu = true
 
   # Integrate Javascript files or stylesheets by adding the url to the external assets or by
   # linking local files with their path relative to the static folder, e.g. "css/styles.css"
@@ -239,6 +239,10 @@ disableHugoGeneratorInject = false
     name       = "About"
     url        = "about/"
   [[menu.main]]
-    identifier = "posts"
-    name       = "Posts"
-    url        = "posts/"
+    identifier = "walkthroughs"
+    name       = "Walkthroughs"
+    url        = "walkthroughs/"
+  [[menu.main]]
+    identifier = "common"
+    name       = "Common.txt"
+    url        = "common/"

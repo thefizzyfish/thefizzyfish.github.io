@@ -2,34 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/posts/boardlight/</loc>
+    <loc>http://localhost:1313/walkthroughs/boardlight/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/busqueda/</loc>
+    <loc>http://localhost:1313/walkthroughs/busqueda/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/commom/</loc>
+    <loc>http://localhost:1313/common/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/editorial/</loc>
+    <loc>http://localhost:1313/walkthroughs/editorial/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/greenhorn/</loc>
+    <loc>http://localhost:1313/walkthroughs/greenhorn/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/linux/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/permx/</loc>
-    <lastmod>2024-08-24T16:50:47-04:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/posts/</loc>
+    <loc>http://localhost:1313/walkthroughs/permx/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/</loc>
+    <lastmod>2024-08-24T16:50:47-04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/walkthroughs/</loc>
     <lastmod>2024-08-24T16:50:47-04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/about/</loc>

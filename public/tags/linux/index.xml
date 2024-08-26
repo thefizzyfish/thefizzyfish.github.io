@@ -10,37 +10,37 @@
     <atom:link href="http://localhost:1313/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Boardlight</title>
-      <link>http://localhost:1313/posts/boardlight/</link>
+      <link>http://localhost:1313/walkthroughs/boardlight/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
-      <guid>http://localhost:1313/posts/boardlight/</guid>
+      <guid>http://localhost:1313/walkthroughs/boardlight/</guid>
       <description>HTB - Linux - Easy</description>
     </item>
     <item>
       <title>Busqueda</title>
-      <link>http://localhost:1313/posts/busqueda/</link>
+      <link>http://localhost:1313/walkthroughs/busqueda/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
-      <guid>http://localhost:1313/posts/busqueda/</guid>
+      <guid>http://localhost:1313/walkthroughs/busqueda/</guid>
       <description>HTB - Linux - Easy</description>
     </item>
     <item>
       <title>Editorial</title>
-      <link>http://localhost:1313/posts/editorial/</link>
+      <link>http://localhost:1313/walkthroughs/editorial/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
-      <guid>http://localhost:1313/posts/editorial/</guid>
+      <guid>http://localhost:1313/walkthroughs/editorial/</guid>
       <description>HTB - Linux - Easy</description>
     </item>
     <item>
       <title>Greenhorn</title>
-      <link>http://localhost:1313/posts/greenhorn/</link>
+      <link>http://localhost:1313/walkthroughs/greenhorn/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
-      <guid>http://localhost:1313/posts/greenhorn/</guid>
+      <guid>http://localhost:1313/walkthroughs/greenhorn/</guid>
       <description>HTB - Linux - Easy</description>
     </item>
     <item>
       <title>Permx</title>
-      <link>http://localhost:1313/posts/permx/</link>
+      <link>http://localhost:1313/walkthroughs/permx/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
-      <guid>http://localhost:1313/posts/permx/</guid>
+      <guid>http://localhost:1313/walkthroughs/permx/</guid>
       <description>HTB - Linux - Easy</description>
     </item>
   </channel>

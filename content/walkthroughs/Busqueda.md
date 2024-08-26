@@ -1,5 +1,6 @@
 +++
 title = 'Busqueda'
+description = 'Easy Linux box'
 date = 2024-08-24T16:50:47-04:00
 draft = false
 tags = ["linux"]
