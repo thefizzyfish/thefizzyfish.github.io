@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>TheFizzyFish-blog</title>
+    <title>TheFizzyFish</title>
     <link>http://localhost:1313/</link>
-    <description>Recent content on TheFizzyFish-blog</description>
+    <description>Recent content on TheFizzyFish</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 27 Aug 2024 17:30:59 -0400</lastBuildDate>

@@ -1,5 +1,5 @@
 baseURL = "https://thefizzyfish.github.io"
-title   = "TheFizzyFish-Blog"
+title   = "TheFizzyFish"
 languageCode = "en-us"
 theme = "hello-friend-ng"
 
