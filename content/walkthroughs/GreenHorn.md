@@ -1,7 +1,7 @@
 +++
 title = 'Greenhorn'
 date = 2024-08-24T16:50:47-04:00
-draft = false
+draft = true
 tags = ["linux"]
 category = ["htb"]
 summary = "HTB - Linux - Easy"

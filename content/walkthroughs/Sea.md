@@ -1,7 +1,7 @@
 +++
 title = 'Sea'
 date = 2024-08-27T17:30:59-04:00
-draft = false
+draft = true
 tags = ["linux"]
 category = ["htb"]
 summary = "HTB - Linux - Easy"
