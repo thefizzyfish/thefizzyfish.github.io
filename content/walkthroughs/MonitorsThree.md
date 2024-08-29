@@ -262,7 +262,7 @@ https://github.com/5ma1l/CVE-2024-25641
 --- 
 # PrivEsc
 
-Since we logged into the duplicati web app, we can perform a backup of the /root directory and restore it from a location we can access.
+Since we successfully logged into the duplicati web app, we can perform a backup of the /root directory and restore it to a location we can access.
 
 We need to add a new backup
 ![](/Screenshots/MonitorsThree_image_22.png)
@@ -283,7 +283,7 @@ We can then try and restore from our new backup
 ![](/Screenshots/MonitorsThree_image_26.png)
 ![](/Screenshots/MonitorsThree_image_27.png)
 
-Then choose where we want to restore themto `source/dev/shm:
+Then choose where we want to restore them to `source/dev/shm:
 ![](/Screenshots/MonitorsThree_image_28.png)
 
 Hit restore and we can check `/dev/shm` to see if we were successful. 

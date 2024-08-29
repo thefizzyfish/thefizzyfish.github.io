@@ -41,7 +41,7 @@
   <meta itemprop="description" content="HTB - Linux - Medium">
   <meta itemprop="datePublished" content="2024-08-28T20:34:25-04:00">
   <meta itemprop="dateModified" content="2024-08-28T20:34:25-04:00">
-  <meta itemprop="wordCount" content="1161">
+  <meta itemprop="wordCount" content="1163">
   <meta itemprop="image" content="http://localhost:1313/">
   <meta itemprop="keywords" content="Linux">
 
@@ -287,7 +287,7 @@ Looking at the data gives us some interesting info
 <p><a href="https://github.com/5ma1l/CVE-2024-25641">https://github.com/5ma1l/CVE-2024-25641</a></p>
 <hr>
 <h1 id="privesc">PrivEsc</h1>
-<p>Since we logged into the duplicati web app, we can perform a backup of the /root directory and restore it from a location we can access.</p>
+<p>Since we successfully logged into the duplicati web app, we can perform a backup of the /root directory and restore it to a location we can access.</p>
 <p>We need to add a new backup
 <img src="/Screenshots/MonitorsThree_image_22.png" alt=""></p>
 <p>backup destination <code>source/dev/shm</code>
@@ -299,7 +299,7 @@ Looking at the data gives us some interesting info
 <p>We can then try and restore from our new backup</p>
 <p><img src="/Screenshots/MonitorsThree_image_26.png" alt="">
 <img src="/Screenshots/MonitorsThree_image_27.png" alt=""></p>
-<p>Then choose where we want to restore themto `source/dev/shm:
+<p>Then choose where we want to restore them to `source/dev/shm:
 <img src="/Screenshots/MonitorsThree_image_28.png" alt=""></p>
 <p>Hit restore and we can check <code>/dev/shm</code> to see if we were successful.</p>
 <p>And we got it.</p>
