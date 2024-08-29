@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Untagged on TheFizzyFish-blog</title>
+    <title>Untagged on TheFizzyFish</title>
     <link>http://localhost:1313/tags/untagged/</link>
-    <description>Recent content in Untagged on TheFizzyFish-blog</description>
+    <description>Recent content in Untagged on TheFizzyFish</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Aug 2024 20:13:40 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 28 Aug 2024 11:01:41 -0400</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>My First Post</title>
-      <link>http://localhost:1313/posts/my-first-post/</link>
-      <pubDate>Sun, 25 Aug 2024 20:13:40 -0400</pubDate>
-      <guid>http://localhost:1313/posts/my-first-post/</guid>
+      <title>Draft</title>
+      <link>http://localhost:1313/walkthroughs/draft/</link>
+      <pubDate>Wed, 28 Aug 2024 11:01:41 -0400</pubDate>
+      <guid>http://localhost:1313/walkthroughs/draft/</guid>
       <description></description>
     </item>
   </channel>
