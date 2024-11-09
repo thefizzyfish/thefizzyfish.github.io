@@ -59,7 +59,7 @@ disableHugoGeneratorInject = false
 
   # Home subtitle of the index page.
   #
-  homeSubtitle = "Are we blanchin'?"
+  homeSubtitle = "Home is where the hax are"
 
   # Set a background for the homepage
   # backgroundImage = "assets/images/background.jpg"

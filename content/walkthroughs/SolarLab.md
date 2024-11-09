@@ -182,7 +182,7 @@ Adding the username `blakeb` and re-running intruder gets us a valid login with
 ![](/Screenshots/SolarLab_image_13.png)
 
 
-We can use the app got generate PDFs.
+We can use the app to generate PDFs.
 
 ![](/Screenshots/SolarLab_image_14.png)
 ![](/Screenshots/SolarLab_image_15.png)
@@ -262,7 +262,7 @@ PS C:\Users\blake\Desktop> ./chisel.exe client 10.10.14.7:443 R:socks
 `Openfire, Version: 4.7.4`
 https://github.com/K3ysTr0K3R/CVE-2023-32315-EXPLOIT
 
-There's an exploit for OpenFIre and this version doesn't appear to be patched.
+There's an exploit for OpenFire and this version doesn't appear to be patched.
 
 ```bash
 ┌──(fish㉿kali)-[~/htb/solarlab/CVE-2023-32315-EXPLOIT]
@@ -363,24 +363,4 @@ We can then access the box with psexec.py and grab the admin flag.
 https://github.com/K3ysTr0K3R/CVE-2023-32315-EXPLOIT
 
 ---
-
-
-# Post/Pivot
-
-
-
----
-
-# Loot
-
-## Creds
-
-| User | Hash | Pass | Location |
-| ---- | ---- | ---- | -------- |
-|      |      |      |          |
-
-## Flags
-| file | Hash |
-| ---- | ---- |
-|      |      |
 
