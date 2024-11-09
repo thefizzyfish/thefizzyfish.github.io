@@ -4,7 +4,7 @@ date = 2024-11-09
 draft = false
 tags = ["Windows"]
 category = ["htb"]
-summary = "HTB - Linux - Medium"
+summary = "HTB - Windows - Medium"
 +++
 
 # Enum
