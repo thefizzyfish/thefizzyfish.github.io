@@ -6,28 +6,28 @@
     <description>Recent content on TheFizzyFish</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Aug 2024 20:34:25 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 09 Nov 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>MonitorsThree</title>
-      <link>http://localhost:1313/walkthroughs/monitorsthree/</link>
-      <pubDate>Wed, 28 Aug 2024 20:34:25 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/monitorsthree/</guid>
+      <title>Blurry</title>
+      <link>http://localhost:1313/walkthroughs/blurry/</link>
+      <pubDate>Sat, 09 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/blurry/</guid>
       <description>HTB - Linux - Medium</description>
     </item>
     <item>
-      <title>Draft</title>
-      <link>http://localhost:1313/walkthroughs/draft/</link>
-      <pubDate>Wed, 28 Aug 2024 11:01:41 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/draft/</guid>
-      <description></description>
+      <title>SolarLab</title>
+      <link>http://localhost:1313/walkthroughs/solarlab/</link>
+      <pubDate>Sat, 09 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/solarlab/</guid>
+      <description>HTB - Windows - Medium</description>
     </item>
     <item>
-      <title>Sea</title>
-      <link>http://localhost:1313/walkthroughs/sea/</link>
-      <pubDate>Tue, 27 Aug 2024 17:30:59 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/sea/</guid>
-      <description>HTB - Linux - Easy</description>
+      <title>Mailing</title>
+      <link>http://localhost:1313/walkthroughs/mailing/</link>
+      <pubDate>Fri, 08 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/mailing/</guid>
+      <description>HTB - Windows - Easy</description>
     </item>
     <item>
       <title>Boardlight</title>
@@ -44,24 +44,17 @@
       <description>HTB - Linux - Easy</description>
     </item>
     <item>
-      <title>common.txt</title>
+      <title>common</title>
       <link>http://localhost:1313/common/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
       <guid>http://localhost:1313/common/</guid>
-      <description>Command commands</description>
+      <description>Common commands</description>
     </item>
     <item>
       <title>Editorial</title>
       <link>http://localhost:1313/walkthroughs/editorial/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
       <guid>http://localhost:1313/walkthroughs/editorial/</guid>
-      <description>HTB - Linux - Easy</description>
-    </item>
-    <item>
-      <title>Greenhorn</title>
-      <link>http://localhost:1313/walkthroughs/greenhorn/</link>
-      <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/greenhorn/</guid>
       <description>HTB - Linux - Easy</description>
     </item>
     <item>
@@ -76,7 +69,7 @@
       <link>http://localhost:1313/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/about/</guid>
-      <description>Hey there, I’m TheFizzyFish, a security rebel with over 5 years of hands-on experience in the wild world of cybersecurity. From diving deep into the chaos of security breaches to navigating the ever-shifting landscape of threats, I’ve seen it all and I’m still hungry for more.&#xA;When I&amp;rsquo;m not cracking codes or hunting down vulnerabilities, I&amp;rsquo;m all about pushing my limits. I dive into Hack The Box challenges to test my skills and keep sharp.</description>
+      <description>Hey there, I’m TheFizzyFish, a security analyst with over 5 years of hands-on experience in the wild world of cybersecurity. From diving deep into the chaos of security breaches to navigating the ever-shifting landscape of threats, I’ve seen it all and I’m still hungry for more.&#xA;When I&amp;rsquo;m not diving head first into logs or hunting down vulnerabilities, I&amp;rsquo;m all about developing my skillset. I play CTF challenges to test my skills and keep sharp and I&amp;rsquo;ll be posting writeups once active boxes are retired.</description>
     </item>
   </channel>
 </rss>

